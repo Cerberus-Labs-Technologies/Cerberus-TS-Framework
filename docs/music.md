@@ -184,3 +184,5 @@ spielt den angegebenen Link kurz ab, dekodiert die empfangenen Pakete und prüft
 Der Test schließt beide Verbindungen anschließend. Das fertige Musik-Plugin-JAR wird separat
 mit einem simulierten Transport auf Command-Ausführung und Ressourcenfreigabe geprüft.
 Den tatsächlich geprüften Live-Umfang dokumentiert [validation.md](validation.md).
+
+Der aktuelle Funktions-, Container- und Darstellungsnachweis steht in [Musik-Webprüfung](music-web-validation.md).

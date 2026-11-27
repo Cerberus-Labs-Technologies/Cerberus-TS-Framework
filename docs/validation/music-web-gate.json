@@ -1,0 +1,327 @@
+{
+  "checkedPage": "Öffentliche Anmeldung; authentifizierte Musikseite separat funktional und per Screenshots geprüft",
+  "latestRun": {
+    "at": "2026-11-27T14:39:39.773Z",
+    "mode": "manual",
+    "status": "fail",
+    "fails": 19,
+    "round": 1,
+    "reused": true,
+    "stopHookActive": false
+  },
+  "status": "fail",
+  "round": 1,
+  "max": 3,
+  "open": [
+    {
+      "check": "hero-fill",
+      "where": "main#login > section.login-form-section \"Am Bot anmelden\"",
+      "msg": "the next section shows on the first screen: it starts at 264px on a 900px screen (the hero ends at 635px)",
+      "fix": "let the hero fill the first screen alone (min-height: 100svh, less above it): nothing of the next section on load",
+      "widths": [
+        1440,
+        390
+      ],
+      "from": "consistency",
+      "ids": [
+        "hero-fill"
+      ],
+      "wheres": [
+        "main#login > section.login-form-section \"Am Bot anmelden\""
+      ]
+    },
+    {
+      "check": "flush",
+      "where": "section.login-copy > div.login-diagram > div.diagram-node.diagram-core > span \"Cerberus TS\"",
+      "msg": "section.login-copy and section.login-form-section run together: -369px between their content, on one ground",
+      "fix": "give the section its padding at the edge where the ground changes (the closing call keeps a clear gap above the footer)",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "flush"
+      ],
+      "wheres": [
+        "section.login-copy > div.login-diagram > div.diagram-node.diagram-core > span \"Cerberus TS\""
+      ]
+    },
+    {
+      "check": "cta",
+      "where": "main#login > section.login-copy",
+      "msg": "the hero has no button (the nav's does not count)",
+      "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+      "widths": [
+        1440,
+        390
+      ],
+      "from": "consistency",
+      "ids": [
+        "cta"
+      ],
+      "wheres": [
+        "main#login > section.login-copy"
+      ]
+    },
+    {
+      "check": "off-grid",
+      "where": "section.login-copy > div.login-diagram > div.diagram-node:nth-of-type(1) > span \"TeamSpeak\"",
+      "msg": "left edge at 137px, 7px off a common edge of its section at 130px (3 elements, like p.max-w-md.text-lg)",
+      "fix": "move it onto the page margin, or the column edge its section uses",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "off-grid"
+      ],
+      "wheres": [
+        "section.login-copy > div.login-diagram > div.diagram-node:nth-of-type(1) > span \"TeamSpeak\""
+      ]
+    },
+    {
+      "check": "moment-none",
+      "where": "(the page)",
+      "msg": "a software page (--type) deals no moment: every kind carries one, two on a long page (moments.md)",
+      "fix": "deal one (moments.mjs pick --page software) and mount it in its own section",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "moment-none"
+      ],
+      "wheres": [
+        "(the page)"
+      ]
+    },
+    {
+      "check": "hero-screen",
+      "where": "main#login > section.login-form-section \"Am Bot anmeldenVerwende einen Zugriffsto\"",
+      "msg": "the hero ends at 640px on a 900px screen, 260px above the fold: it ends at the fold, 1px either way (SR-1)",
+      "fix": "make the hero exactly one screen (height: 100svh, its content fitted inside), never taller or shorter",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "hero-screen"
+      ],
+      "wheres": [
+        "main#login > section.login-form-section \"Am Bot anmeldenVerwende einen Zugriffsto\""
+      ]
+    },
+    {
+      "check": "hero-screen",
+      "where": "main#login > section.login-copy \"Cerberus TS 2.0TeamSpeak-Verwaltungfür d\"",
+      "msg": "631px of the next section shows on the first screen (from 269px on a 900px screen): nothing below the hero shows at load (SR-1)",
+      "fix": "end the hero at the fold so nothing of the next section shows at load (hero height: 100svh)",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "hero-screen"
+      ],
+      "wheres": [
+        "main#login > section.login-copy \"Cerberus TS 2.0TeamSpeak-Verwaltungfür d\""
+      ]
+    },
+    {
+      "check": "section-height",
+      "where": "div#root > div.login-page > footer.login-footer \"Cerberus LabsTeamSpeak-Verwaltung mit Pl\"",
+      "msg": "the section is 72px tall (0.1 screens), 828px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+      "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "section-height"
+      ],
+      "wheres": [
+        "div#root > div.login-page > footer.login-footer \"Cerberus LabsTeamSpeak-Verwaltung mit Pl\""
+      ]
+    },
+    {
+      "check": "section-height",
+      "where": "main#login > section.login-copy \"Cerberus TS 2.0TeamSpeak-Verwaltungfür d\"",
+      "msg": "the section is 366px tall (0.4 screens), 534px short of one screen (900px): every section after the hero is one screen or two, 2px either way (SR-2)",
+      "fix": "set the section to one screen or two (height: calc(var(--h,1) * 100vh), --h 1 or 2) and cut or split its content to fit",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "section-height"
+      ],
+      "wheres": [
+        "main#login > section.login-copy \"Cerberus TS 2.0TeamSpeak-Verwaltungfür d\"",
+        "main#login > section.login-form-section \"Am Bot anmeldenVerwende einen Zugriffsto\""
+      ]
+    },
+    {
+      "check": "one-section",
+      "where": "h1#login-title \"TeamSpeak-Verwaltungfür deine Community.\"",
+      "msg": "the screen at scroll 0px (stride 0) shows 366px of section 2 and the heading of section 2 whole and the content of 2 sections, over 24px each beside section 1: a screen shows one section (another may peek 8px, 24px WARN) (SR-4)",
+      "fix": "make each section exactly one screen or two, so a screen shows one section and no neighbour peeks",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "one-section"
+      ],
+      "wheres": [
+        "h1#login-title \"TeamSpeak-Verwaltungfür deine Community.\""
+      ]
+    },
+    {
+      "check": "one-heading",
+      "where": "h2#sign-in-title \"Am Bot anmelden\"",
+      "msg": "the hero holds an h2 (1): its heading is the h1, and an h2 opens the next section (SR-5)",
+      "fix": "give each section one h2, first in its .wrap, and the hero only its h1",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "one-heading"
+      ],
+      "wheres": [
+        "h2#sign-in-title \"Am Bot anmelden\""
+      ]
+    },
+    {
+      "check": "container-edges",
+      "where": "div#root > div.login-page > header.login-header \"Cerberus TSCerberus Labs\"",
+      "msg": "the nav's content runs 149px from the left and 101px from the right (read from its outermost blocks: no .wrap): the page's container starts at 101px; 149 and 101px are not one margin; the margin is 64-120px at 1440px (one container, equal margins, 2px either way) (SR-6)",
+      "fix": "use one container on every section and the nav (.wrap): one margin left and right, 64-120px on a desktop, 16-24px on a phone",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "container-edges"
+      ],
+      "wheres": [
+        "div#root > div.login-page > header.login-header \"Cerberus TSCerberus Labs\""
+      ]
+    },
+    {
+      "check": "container-edges",
+      "where": "div#root \"Zum InhaltCerberus TSCerberus LabsCerber\"",
+      "msg": "a <div> at the top of the page, outside header.nav, main, footer.closing and nav.actionbar (SR-6)",
+      "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "container-edges"
+      ],
+      "wheres": [
+        "div#root \"Zum InhaltCerberus TSCerberus LabsCerber\""
+      ]
+    },
+    {
+      "check": "container-edges",
+      "where": "main#login > section.login-form-section \"Am Bot anmeldenVerwende einen Zugriffsto\"",
+      "msg": "the section needs exactly one in-flow child .wrap (it has 4 in-flow children, 0 .wrap) (SR-6)",
+      "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "container-edges"
+      ],
+      "wheres": [
+        "main#login > section.login-form-section \"Am Bot anmeldenVerwende einen Zugriffsto\""
+      ]
+    },
+    {
+      "check": "container-edges",
+      "where": "main#login > section.login-copy \"Cerberus TS 2.0TeamSpeak-Verwaltungfür d\"",
+      "msg": "the section needs exactly one in-flow child .wrap (it has 4 in-flow children, 0 .wrap) (and 1 more like it: \"Cerberus LabsTeamSpeak-V\") (SR-6)",
+      "fix": "build the page as header.nav, a main of sections (each one in-flow .wrap plus background layers) and footer.closing",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "container-edges"
+      ],
+      "wheres": [
+        "main#login > section.login-copy \"Cerberus TS 2.0TeamSpeak-Verwaltungfür d\""
+      ]
+    },
+    {
+      "check": "container-edges",
+      "where": "h2#sign-in-title \"Am Bot anmelden\"",
+      "msg": "5 text blocks start on a left line at x 897, 797px from the container's left: text starts on the container's left, or on one split line (x 627, 732, 837) (also \"Verwende einen Zugriffstoken aus\", \"Zugriffstoken\", \"Erstelle den Token in der Bot-Ko\") (SR-6)",
+      "fix": "start the text on the container's left, or on the one split line every split shares",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "container-edges"
+      ],
+      "wheres": [
+        "h2#sign-in-title \"Am Bot anmelden\""
+      ]
+    },
+    {
+      "check": "container-edges",
+      "where": "section.login-copy > div.login-diagram > div.diagram-node:nth-of-type(1) > span \"TeamSpeak\"",
+      "msg": "1 text block starts on a left line at x 137, 36px from the container's left: text starts on the container's left, or on one split line (x 627, 732, 837) (and 2 more like it: x 130, \"TeamSpeak-Verwaltungfür \") (SR-6)",
+      "fix": "start the text on the container's left, or on the one split line every split shares",
+      "widths": [
+        1440
+      ],
+      "from": "consistency",
+      "ids": [
+        "container-edges"
+      ],
+      "wheres": [
+        "section.login-copy > div.login-diagram > div.diagram-node:nth-of-type(1) > span \"TeamSpeak\""
+      ]
+    },
+    {
+      "check": "text-only",
+      "where": "main#login > section.login-form-section \"Am Bot anmelden\"",
+      "msg": "the closing section is only text: no picture, icon, mock or effect in it",
+      "fix": "give the section a visual: a photograph that fits, the real icons, or a UI fragment on a ground",
+      "widths": [
+        390
+      ],
+      "from": "consistency",
+      "ids": [
+        "text-only"
+      ],
+      "wheres": [
+        "main#login > section.login-form-section \"Am Bot anmelden\""
+      ]
+    },
+    {
+      "check": "container",
+      "where": "page",
+      "msg": "no .wrap",
+      "fix": "put the content in one .wrap",
+      "widths": [
+        1440,
+        390
+      ],
+      "from": "layout",
+      "ids": [
+        "container"
+      ],
+      "wheres": [
+        "page"
+      ]
+    }
+  ],
+  "waived": [],
+  "warnCount": 5
+}
