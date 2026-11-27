@@ -8,7 +8,7 @@ Die Funktion ist als Vorschau implementiert. Der vollständige Build ist bestand
 - Sieben Node-Medienprüfungen bestanden: Channel-/Zuschauerfreigabe, kompaktes Opus-/VP8-Angebot mit Audio zuerst, Quellen- und Pfadprüfung inklusive Symlinks, tatsächliche FFmpeg-RTP-Ausgabe/Pause/Fortsetzen/Stop, Pelican-ICE-Adresse, stummes Video mit sauberem Dateiende und tatsächliche Laufzeit-Lautstärkeänderung bis auf stummes PCM.
 - [17 Video-Browserprüfungen](validation/video-browser.json): echte Kotlin-HTTP-API und Worker-IPC mit isoliertem Fixture-Worker. Verbindung, Streamstatus, Zuschaueranzahl, Queue/Skip, Pause/Fortsetzen, Lautstärke, Channelwechsel, Löschen, Lesetoken-Abweisung, Polling ohne Fokus-/Entwurfsverlust, keine unbehandelten Browserfehler. Grenzen und Bedienelemente bei 1440/1024/820/768/390/320 px geprüft. Der Fixture-Worker überträgt kein echtes Video.
 - [16 bisherige Audio-Browserprüfungen](validation/video-audio-regression.json) unverändert bestanden; tatsächliche WAV-Wiedergabe über FFmpeg und vorhandene Musik-API.
-- Acht Pelican-Prüfungen, tatsächlicher lokaler Pelican-Start mit Webauthentifizierung/Console-Stop und Distributions-Smoke-Test bestanden. Kein lokaler Docker-Daemon verfügbar; das neue Container-Image muss zusätzlich in GitHub Actions gebaut/geprüft werden.
+- Acht Pelican-Prüfungen, tatsächlicher lokaler Pelican-Start mit Webauthentifizierung/Console-Stop und Distributions-Smoke-Test bestanden. Kein lokaler Docker-Daemon verfügbar. Der zusätzliche GitHub-Container-Build und der Test des tatsächlichen non-root amd64-Runtimes sind inzwischen erfolgreich abgeschlossen; amd64 und arm64 wurden veröffentlicht. Ein separater vollständiger arm64-Runtime-Test wurde nicht ausgeführt.
 
 ## TS6-Server und YouTube
 
@@ -20,4 +20,16 @@ Diese Tests belegen weder eine offizielle TeamSpeak-API noch die Funktion jeder 
 
 ## Sichtprüfung
 
-Die authentifizierte Video-Oberfläche wurde über das bestehende, unveränderte Taste-Screenshot-Werkzeug mit dem vorhandenen Login-Adapter aufgenommen und bei 1440 und 390 px angesehen. Die Aufnahmen zeigen isolierte HTTP-Fixture-Daten, keine produktiven Zuschauerzahlen. Dateien liegen lokal unter `web/shots/video-{1440,390}.png` und werden nicht ins Repository übernommen. Kein Überlauf oder überlagerte Bedienelemente in diesen Ansichten. Weitere Breiten wurden funktional, aber noch nicht als separate Bilder angesehen. Der vorherige visuelle Gesamtstatus wird dadurch nicht als bestanden ausgegeben.
+Die authentifizierte Video-Oberfläche wurde über das bestehende, unveränderte Taste-Screenshot-Werkzeug mit dem vorhandenen Login-Adapter aufgenommen und bei 1440, 1024, 820, 768 und 390 px angesehen. Die Aufnahmen zeigen isolierte HTTP-Fixture-Daten, keine produktiven Zuschauerzahlen. Dateien liegen lokal unter `web/shots/video-{1440,1024,820,768,390}.png` und werden nicht ins Repository übernommen. Kein Überlauf oder überlagerte Bedienelemente in diesen Ansichten. 320 px wurden funktional, aber nicht als separates Bild angesehen. Der vorherige visuelle Gesamtstatus wird dadurch nicht als bestanden ausgegeben.
+
+
+## Veröffentlichung
+
+Funktionsstand: Commit `fda417e2970f1f684f89c1782497759f6c695cdc`.
+
+- [Pelican-Container-Validierung und Veröffentlichung](https://github.com/Cerberus-Labs-Technologies/Cerberus-TS-Framework/actions/runs/46074141647): erfolgreich.
+- [Kotlin-Build und CodeQL](https://github.com/Cerberus-Labs-Technologies/Cerberus-TS-Framework/actions/runs/46074141626): erfolgreich.
+- Image: `ghcr.io/cerberus-labs-technologies/cerberus-ts-framework:latest` bzw. unveränderlich `:sha-fda417e2970f1f684f89c1782497759f6c695cdc`.
+- Öffentlich ohne Anmeldung abrufbarer Manifest-Digest: `sha256:5640e74dd38a2cbd3c5fe9e90feb421c61396db41557c1d99ce2fe198bb02f6f` (linux/amd64 und linux/arm64; zusätzliche Attestierungsmanifeste sind keine weiteren Runtime-Plattformen).
+
+Die aktualisierten Eggs sind öffentlich. Für Video bleiben die zusätzlichen UDP-Allocations und die tatsächliche Firewall-/NAT-Einrichtung gemäß [Video-Anleitung](video.md) erforderlich. Die automatische Veröffentlichung aktualisiert keinen bereits laufenden Pelican-Container.
