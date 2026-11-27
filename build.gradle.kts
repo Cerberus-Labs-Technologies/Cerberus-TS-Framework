@@ -45,7 +45,27 @@ tasks.processResources {
     dependsOn(webBuild)
     from(webDirectory.dir("dist")) { into("web") }
 }
+val videoInstall = tasks.register<Exec>("videoInstall") {
+    group = "build"
+    description = "Install the locked TS6 video worker dependencies"
+    workingDir(layout.projectDirectory.dir("video"))
+    commandLine(providers.environmentVariable("CERBERUS_NPM").getOrElse("npm"), "ci", "--omit=dev", "--no-fund", "--no-audit")
+    inputs.files("video/package.json", "video/package-lock.json")
+    outputs.dir("video/node_modules")
+}
+val videoTest = tasks.register<Exec>("videoTest") {
+    group = "verification"
+    dependsOn(videoInstall)
+    workingDir(layout.projectDirectory.dir("video"))
+    commandLine(providers.environmentVariable("CERBERUS_NPM").getOrElse("npm"), "test")
+    inputs.files(fileTree("video") { exclude("node_modules/**") })
+    outputs.upToDateWhen { false }
+}
+tasks.named("check") { dependsOn(videoTest) }
+tasks.named("distTar") { dependsOn(videoInstall) }
+tasks.named("distZip") { dependsOn(videoInstall) }
 tasks.named<Sync>("installDist") {
+    dependsOn(videoInstall)
     providers.gradleProperty("cerberus.install.dir").orNull?.let { destinationDir = file(it) }
 }
 
@@ -55,6 +75,7 @@ distributions {
             from("README.md", "LICENSE", "NOTICE", "CHANGELOG.md", "SECURITY.md")
             from("config") { include("cerberus.example.properties"); into("config") }
             from("docs") { into("docs") }
+            from("video") { exclude("test/**", "test-placeholder.tmp"); into("video") }
         }
     }
 }

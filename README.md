@@ -62,6 +62,7 @@ Siehe [offizielle TS6-Konfiguration](https://github.com/teamspeak/teamspeak6-ser
 - Optionaler REST-Server mit Bearer-Tokens, Ablaufzeit und Method-/Pfad-Scopes. Token-Dateien speichern SHA-256-Hashes.
 - [Webinterface](docs/web.md) mit echten Botdaten, Token-Anmeldung und durch Plugins ergänzbaren Seiten, Assets und APIs.
 - Mehrere Musik-Bots mit eigenen Voice-Identitäten, Dateien, HTTP-/Radio-Streams, YouTube, Queue, Pause und Lautstärke; siehe [Musik-Bots](docs/music.md).
+- TS6-Video-Bots als Vorschau mit YouTube, Videodateien, Websteuerung und synchronem VP8-/Opus-Stream; siehe [Video-Bots und Pelican-UDP-Einrichtung](docs/video.md).
 - Optionales [Server-Setup-Plugin](docs/server-setup.md): Community-Aufbau mit Channels, Server-/Channelgruppen, YAML-Abgleich beim Start und geschütztem Entfernen eigener Objekte.
 
 `!help`, `!whoami`, `!whereami` benötigen kein Framework-Recht.

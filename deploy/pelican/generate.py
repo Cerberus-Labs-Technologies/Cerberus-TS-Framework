@@ -27,6 +27,9 @@ def eggs():
         variable('Administrator UID', 'CERBERUS_ADMIN_UID', '', 'nullable|string|max:100', 'Stabile TeamSpeak-UID für Framework-Adminrechte; kein Nickname.'),
         variable('Voice server password', 'CERBERUS_VOICE_PASSWORD', '', 'nullable|string|max:1024', 'Optionales Voice-Passwort; unabhängig vom Query-Passwort.'),
         variable('Bundled plugins', 'CERBERUS_BUNDLED_PLUGINS', 'welcome,music', 'required|string|max:100', 'Kommagetrennt: welcome,music,server-setup oder none. server-setup ändert den TS-Server beim Start und ist standardmäßig aus.'),
+        variable('Video public IPv4', 'CERBERUS_VIDEO_PUBLIC_ADDRESS', '', 'nullable|ipv4', 'Für Video-Bots: öffentliche IPv4 des Pelican-Nodes. Zusätzliche UDP-Allocations müssen 1:1 veröffentlicht werden; siehe docs/video.md.'),
+        variable('Video UDP first port', 'CERBERUS_VIDEO_PORT_MIN', '24900', 'required|integer|between:1024,65534', 'Erster UDP-Port für WebRTC. Alle Ports bis einschließlich Video UDP last port als zusätzliche Allocations zuweisen und in der Firewall freigeben.'),
+        variable('Video UDP last port', 'CERBERUS_VIDEO_PORT_MAX', '24919', 'required|integer|between:1025,65535', 'Letzter UDP-Port für WebRTC; muss größer als der erste Port sein. Primäre TCP-Allocation bleibt das Webinterface.'),
         variable('Maximum music bots', 'CERBERUS_MUSIC_MAX_BOTS', '4', 'required|integer|between:1,32', 'Jeder Musikbot belegt einen TeamSpeak-Client-Slot.'),
         variable('Maximum queue size', 'CERBERUS_MUSIC_MAX_QUEUE', '100', 'required|integer|between:1,10000', 'Maximale Einträge je Musikbot.'),
     ]
@@ -34,7 +37,7 @@ def eggs():
                meta=dict(version='PLCN_v3', update_url=None),
                exported_at='2026-11-27T00:00:00+00:00', uuid='0b29601d-f4c0-4fae-9641-88fd71b6fc57',
                name='Cerberus TS', author='Cerberus Labs',
-               description='Kotlin TeamSpeak framework with Paper-style plugins, extensible web interface and music bots. Requires the Cerberus runtime image, a verified SSH host key and one TCP allocation. See docs/pelican.md.',
+               description='Kotlin TeamSpeak framework with Paper-style plugins, extensible web interface and music bots. Requires the Cerberus runtime image, a verified SSH host key and one TCP allocation. Optional video bots need additional UDP allocations; see docs/video.md and docs/pelican.md.',
                tags=['TeamSpeak', 'Bots', 'Java', 'Cerberus Labs'], features=[],
                docker_images={'Cerberus TS · Java 21 + Music': IMAGE}, file_denylist=[],
                startup_commands={'Standard': 'bash /opt/cerberus/start.sh'},

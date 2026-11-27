@@ -15,6 +15,7 @@ data class MusicStatus(val id: String, val clientId: Int, val connected: Boolean
 /** Each bot owns a persistent identity, independent Voice connection, queue and decoder worker. */
 class MusicService(private val directory: Path, private val config: MusicConfig = MusicConfig(),
     private val provider: VoiceProvider = Ts3jVoiceProvider()) : AutoCloseable {
+    val video = VideoService(directory, config)
     private val bots = linkedMapOf<String, MusicBot>()
     private var closed = false
     @Synchronized fun create(id: String, host: String, port: Int, channelId: Int,
@@ -39,6 +40,7 @@ class MusicService(private val directory: Path, private val config: MusicConfig 
     override fun close() {
         val owned = synchronized(this) { if (closed) return; closed = true; bots.values.toList().also { bots.clear() } }
         owned.forEach { runCatching { it.close() } }
+        video.close()
     }
 }
 

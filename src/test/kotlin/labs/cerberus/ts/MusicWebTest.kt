@@ -105,6 +105,15 @@ class MusicWebTest {
                                     return client.send(builder.method(method, body?.let(HttpRequest.BodyPublishers::ofString) ?: HttpRequest.BodyPublishers.noBody()).build(), HttpResponse.BodyHandlers.ofString())
                                 }
                                 fun action(body: String) = request("POST", "/bots/radio/actions", body)
+                                assertEquals(200, request("GET", "/video").statusCode())
+                                for ((method, path, body) in listOf(
+                                    Triple("POST", "/video", """{"id":"denied","channelId":7}"""),
+                                    Triple("POST", "/video/denied/actions", """{"action":"play","source":"clip.mp4"}"""),
+                                    Triple("DELETE", "/video/denied", null)
+                                )) {
+                                    assertEquals(401, request(method, path, body, read).statusCode())
+                                    assertEquals(401, request(method, path, body, null).statusCode())
+                                }
                                 val page = web.pages().single()
                                 assertEquals("music", page.plugin); assertEquals("Musik-Bots", page.title)
                                 val asset = client.send(HttpRequest.newBuilder(URI("http://127.0.0.1:${rest.port}${page.module}")).build(), HttpResponse.BodyHandlers.ofString())

@@ -30,3 +30,9 @@ docs/licenses/{hibernate,HikariCP,classgraph}-LICENSE.txt.
 The unmodified MariaDB Connector/J 4.0.0 is supplied as a separate runtime JAR
 under LGPL-2.1-or-later; its license is in docs/licenses/mariadb-connector-j-LICENSE.txt.
 Corresponding upstream source: https://github.com/mariadb-corporation/mariadb-connector-j/tree/4.0.0
+
+The optional TS6 video worker uses @honeybbq/teamspeak (MIT) and werift (MIT).
+Their licenses and the teamspeak-js third-party notices are retained in video/
+inside the installed dependency packages and in docs/licenses/. Node dependencies
+are locked in video/package-lock.json. This is an independent, experimental
+implementation of TeamSpeak 6 stream signalling, not an official TeamSpeak SDK.

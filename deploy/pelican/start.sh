@@ -23,7 +23,7 @@ if [[ ! -e config/cerberus.properties ]]; then
     cp "$cerberus_root/app/config/cerberus.example.properties" config/cerberus.properties
 fi
 # Blank optional panel fields must not shadow values in the properties file.
-for optional in CERBERUS_PASSWORD CERBERUS_API_KEY CERBERUS_ADMIN_UID CERBERUS_VOICE_PASSWORD; do
+for optional in CERBERUS_PASSWORD CERBERUS_API_KEY CERBERUS_ADMIN_UID CERBERUS_VOICE_PASSWORD CERBERUS_VIDEO_PUBLIC_ADDRESS; do
     if [[ -z "${!optional:-}" ]]; then unset "$optional"; fi
 done
 if [[ "${CERBERUS_TRANSPORT:-SSH}" == SSH ]] && { [[ ! -s "$CERBERUS_KNOWN_HOSTS" ]] || ! grep -Eq '^[^#[:space:]]+[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+' "$CERBERUS_KNOWN_HOSTS"; }; then

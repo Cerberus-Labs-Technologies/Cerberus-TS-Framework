@@ -1,3 +1,5 @@
+import { mountVideo } from "./video.js";
+
 export async function mount(root, api) {
   let disposed = false;
   let busy = false;
@@ -74,6 +76,16 @@ export async function mount(root, api) {
         </section>
       </div>
     </div>`;
+  const audioPanel = document.createElement("div");
+  while (root.firstChild) audioPanel.append(root.firstChild);
+  const videoPanel = document.createElement("div"); videoPanel.hidden = true;
+  const modes = document.createElement("div"); modes.className = "music-actions music-mode-nav"; modes.setAttribute("aria-label", "Wiedergabeart");
+  const audioMode = document.createElement("button"); audioMode.type = "button"; audioMode.textContent = "Audio-Bots"; audioMode.setAttribute("aria-pressed", "true");
+  const videoMode = document.createElement("button"); videoMode.type = "button"; videoMode.textContent = "Video-Bots (Vorschau)"; videoMode.setAttribute("aria-pressed", "false");
+  audioMode.onclick = () => { audioPanel.hidden = false; videoPanel.hidden = true; audioMode.setAttribute("aria-pressed", "true"); videoMode.setAttribute("aria-pressed", "false"); };
+  videoMode.onclick = () => { audioPanel.hidden = true; videoPanel.hidden = false; audioMode.setAttribute("aria-pressed", "false"); videoMode.setAttribute("aria-pressed", "true"); };
+  modes.append(audioMode, videoMode); root.append(modes, audioPanel, videoPanel);
+  const disposeVideo = await mountVideo(videoPanel, api);
   const find = (selector) => root.querySelector(selector);
   const text = (selector, value) => {
     find(selector).textContent = value;
@@ -355,6 +367,7 @@ export async function mount(root, api) {
     revision++;
     clearTimeout(timer);
     abort.abort();
+    disposeVideo();
     root.replaceChildren();
   };
 }

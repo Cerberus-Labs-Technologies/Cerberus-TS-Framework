@@ -8,7 +8,7 @@
     "uuid": "0b29601d-f4c0-4fae-9641-88fd71b6fc57",
     "name": "Cerberus TS",
     "author": "Cerberus Labs",
-    "description": "Kotlin TeamSpeak framework with Paper-style plugins, extensible web interface and music bots. Requires the Cerberus runtime image, a verified SSH host key and one TCP allocation. See docs/pelican.md.",
+    "description": "Kotlin TeamSpeak framework with Paper-style plugins, extensible web interface and music bots. Requires the Cerberus runtime image, a verified SSH host key and one TCP allocation. Optional video bots need additional UDP allocations; see docs/video.md and docs/pelican.md.",
     "tags": [
         "TeamSpeak",
         "Bots",
@@ -152,6 +152,36 @@
             "user_viewable": true,
             "user_editable": true,
             "rules": "required|string|max:100",
+            "field_type": "text"
+        },
+        {
+            "name": "Video public IPv4",
+            "description": "Für Video-Bots: öffentliche IPv4 des Pelican-Nodes. Zusätzliche UDP-Allocations müssen 1:1 veröffentlicht werden; siehe docs/video.md.",
+            "env_variable": "CERBERUS_VIDEO_PUBLIC_ADDRESS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|ipv4",
+            "field_type": "text"
+        },
+        {
+            "name": "Video UDP first port",
+            "description": "Erster UDP-Port für WebRTC. Alle Ports bis einschließlich Video UDP last port als zusätzliche Allocations zuweisen und in der Firewall freigeben.",
+            "env_variable": "CERBERUS_VIDEO_PORT_MIN",
+            "default_value": "24900",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1024,65534",
+            "field_type": "text"
+        },
+        {
+            "name": "Video UDP last port",
+            "description": "Letzter UDP-Port für WebRTC; muss größer als der erste Port sein. Primäre TCP-Allocation bleibt das Webinterface.",
+            "env_variable": "CERBERUS_VIDEO_PORT_MAX",
+            "default_value": "24919",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1025,65535",
             "field_type": "text"
         },
         {

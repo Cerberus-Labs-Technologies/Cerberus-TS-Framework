@@ -41,6 +41,21 @@ class MusicWebController(private val plugin: MusicPlugin, private val music: Mus
         }
         bot.status()
     }
+    @RequestMapping(RequestMethod.GET, "/video") fun video() = mapOf("available" to music.video.available(), "bots" to music.video.list(), "maxViewers" to 4, "maxHeight" to 720)
+    @RequestMapping(RequestMethod.POST, "/video") fun createVideo(@RequestBody body: Create) = plugin.webWrite {
+        plugin.createVideoBot(body.id, body.channelId, body.nickname, body.channelPassword)
+    }
+    @RequestMapping(RequestMethod.POST, "/video/{id}/actions")
+    fun videoAction(@PathParam("id") id: String, @RequestBody body: Action) = plugin.webWrite {
+        requireVideo(id).action(body.action, body.source, body.volume, body.channelId, body.channelPassword)
+    }
+    @RequestMapping(RequestMethod.DELETE, "/video/{id}") fun removeVideo(@PathParam("id") id: String) = plugin.webWrite {
+        requireVideo(id)
+        plugin.removeVideoBot(id)
+        mapOf("removed" to true)
+    }
+    private fun requireVideo(id: String) = music.video.list().firstOrNull { it.id == id }?.let { music.video.bot(id) }
+        ?: throw RestException(404, "Dieser Video-Bot existiert nicht mehr.")
     private fun requireBot(id: String) = music.list().firstOrNull { it.id == id }?.let { music.bot(id) }
         ?: throw RestException(404, "Dieser Musik-Bot existiert nicht mehr.")
 }

@@ -32,3 +32,4 @@ logs/
 
 # File managers #
 .directory
+/video/node_modules/

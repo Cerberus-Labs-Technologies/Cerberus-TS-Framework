@@ -146,3 +146,5 @@ Quellen: [Pelican-Egg-Konfiguration](https://pelican.dev/docs/eggs/creating-a-cu
 [private Wings-Registries](https://pelican.dev/docs/wings/optional-config/),
 [GHCR-Authentifizierung](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry),
 [yt-dlp-Abhängigkeiten](https://github.com/yt-dlp/yt-dlp#dependencies).
+
+Für optionale Video-Bots zusätzlich die UDP-Allocations und die öffentliche Node-IP aus [docs/video.md](video.md) einrichten. Die vorhandene primäre Allocation bleibt für das Webinterface erhalten.

@@ -232,3 +232,6 @@
     transform: none !important;
   }
 }
+
+.music-mode-nav { margin-bottom: 1.25rem; }
+.music-mode-nav button[aria-pressed="true"] { border-color: var(--accent, #1864e8); color: var(--accent, #1864e8); }

@@ -154,6 +154,10 @@ try {
           "false",
         );
     }
+    if (metadata.mode === "fixture" && metadata.captureVideo && route === "/plugins/music/control") {
+      await page.getByRole("button", { name: "Video-Bots (Vorschau)", exact: true }).click();
+      await expect(page.getByRole("heading", { name: "Video abspielen", exact: true })).toBeVisible();
+    }
     if (metadata.mode === "fixture" && route === "/channels") {
       await page.locator(".channel-name").first().click();
       await expect(

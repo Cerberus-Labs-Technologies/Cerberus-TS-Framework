@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fontconf
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /source
 COPY . .
-RUN chmod +x gradlew && CERBERUS_TEST_FFMPEG=/usr/bin/ffmpeg ./gradlew \
+RUN chmod +x gradlew && CERBERUS_TEST_FFMPEG=/usr/bin/ffmpeg CERBERUS_TEST_FFPROBE=/usr/bin/ffprobe CERBERUS_TEST_NODE=/usr/local/bin/node ./gradlew \
     build :examples:welcome-plugin:build :examples:music-plugin:build \
     :examples:server-setup-plugin:build installDist --no-daemon --no-watch-fs --console=plain
 

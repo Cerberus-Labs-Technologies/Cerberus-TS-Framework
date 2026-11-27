@@ -1,0 +1,74 @@
+{
+  "mode": "fixture",
+  "checks": [
+    {
+      "name": "video module loads as a registered authenticated plugin asset",
+      "passed": true
+    },
+    {
+      "name": "read tokens cannot create, change or delete video clients",
+      "passed": true
+    },
+    {
+      "name": "create video bot through real HTTP and worker IPC",
+      "passed": true
+    },
+    {
+      "name": "video playback exposes stream title and viewer count",
+      "passed": true
+    },
+    {
+      "name": "polling keeps video input focus and unfinished source",
+      "passed": true
+    },
+    {
+      "name": "video pause and resume reflect worker state",
+      "passed": true
+    },
+    {
+      "name": "enqueue and skip use the selected video bot",
+      "passed": true
+    },
+    {
+      "name": "volume command reaches worker",
+      "passed": true
+    },
+    {
+      "name": "moving video bot ends publication and queue",
+      "passed": true
+    },
+    {
+      "name": "video controls fit at 1440px",
+      "passed": true
+    },
+    {
+      "name": "video controls fit at 1024px",
+      "passed": true
+    },
+    {
+      "name": "video controls fit at 820px",
+      "passed": true
+    },
+    {
+      "name": "video controls fit at 768px",
+      "passed": true
+    },
+    {
+      "name": "video controls fit at 390px",
+      "passed": true
+    },
+    {
+      "name": "video controls fit at 320px",
+      "passed": true
+    },
+    {
+      "name": "delete disconnects worker and clears selection",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser exceptions",
+      "passed": true
+    }
+  ],
+  "uncaught": []
+}

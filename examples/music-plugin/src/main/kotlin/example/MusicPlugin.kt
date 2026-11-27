@@ -13,6 +13,7 @@ class MusicPlugin : JavaPlugin() {
     private val busy = AtomicBoolean()
     private val stopping = AtomicBoolean()
     private val ownership = Any()
+    private val ownedVideoBots = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
     private val ownedBots = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
     private val worker = Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().name("cerberus-music-commands").factory())
     override fun onEnable() {
@@ -60,7 +61,7 @@ class MusicPlugin : JavaPlugin() {
         if (server.web.isAvailable) {
             server.web.registerController(MusicWebController(this, music))
             server.web.registerPage(WebPage("control", "Musik-Bots", "Musik abspielen, Bots verbinden und Warteschlangen verwalten.", "index.js", "style.css", 50),
-                mapOf("index.js" to "web/index.js", "style.css" to "web/style.css"))
+                mapOf("index.js" to "web/index.js", "style.css" to "web/style.css", "video.js" to "web/video.js"))
         }
         logger.info("Musik-Befehle bereit: !music help")
     }
@@ -89,6 +90,19 @@ class MusicPlugin : JavaPlugin() {
         }
         return status
     }
+    internal fun createVideoBot(id: String, channelId: Int, nickname: String, channelPassword: String? = null): labs.cerberus.ts.music.VideoStatus {
+        val voice = server.teamSpeak
+        if (!voice.isConnected) throw RestException(503, "Die Query-Verbindung zum TeamSpeak-Server fehlt.")
+        val video = getService(MusicService::class.java).video
+        val status = video.create(id, voice.config.host, voice.serverInfo().getValue("virtualserver_port").toInt(), channelId,
+            nickname.ifBlank { "Cerberus Video $id".take(30) }, System.getenv("CERBERUS_VOICE_PASSWORD"), channelPassword)
+        synchronized(ownership) {
+            if (stopping.get()) { video.remove(id); throw RestException(503, "Das Musik-Plugin wird beendet.") }
+            ownedVideoBots += id
+        }
+        return status
+    }
+    internal fun removeVideoBot(id: String) { getService(MusicService::class.java).video.remove(id); ownedVideoBots -= id }
     internal fun removeBot(id: String) {
         getService(MusicService::class.java).remove(id)
         ownedBots -= id
@@ -118,5 +132,7 @@ class MusicPlugin : JavaPlugin() {
         catch (_: InterruptedException) { Thread.currentThread().interrupt() }
         val ids = synchronized(ownership) { ownedBots.toList().also { ownedBots.clear() } }
         ids.forEach { id -> runCatching { getService(MusicService::class.java).remove(id) } }
+        val videoIds = synchronized(ownership) { ownedVideoBots.toList().also { ownedVideoBots.clear() } }
+        videoIds.forEach { id -> runCatching { getService(MusicService::class.java).video.remove(id) } }
     }
 }

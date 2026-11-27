@@ -2,6 +2,8 @@
 
 ## 2.0.0-SNAPSHOT
 
+- Optionale TS6-Video-Bots im Musik-Webinterface: YouTube, HTTP-Video und lokale Dateien mit VP8/Opus, synchronen Medien aus einem Decoder, Queue und Wiedergabesteuerung. Vorschau mit Channel-Freigabe, vier Zuschauern, persistenten Identitäten und Pelican-UDP-Konfiguration.
+
 - Webverwaltung für Channels, Server-/Channelgruppen, Rechtekatalog und Client-Zuweisungen; Revisionen schützen Channel-Entwürfe vor unbemerktem Überschreiben. TS6-CRUD separat an eigenen Testobjekten geprüft.
 
 - Musiksteuerung als Plugin-Seite im Webinterface: Bots verbinden/trennen, Wiedergabe und Queue, Pause/Skip/Stop, Lautstärke, Channelwechsel und Titel-/Fehlerstatus; geschützte HTTP-API mit Plugin-Lebenszyklus.

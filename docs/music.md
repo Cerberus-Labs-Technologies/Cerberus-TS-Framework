@@ -186,3 +186,5 @@ mit einem simulierten Transport auf Command-Ausführung und Ressourcenfreigabe g
 Den tatsächlich geprüften Live-Umfang dokumentiert [validation.md](validation.md).
 
 Der aktuelle Funktions-, Container- und Darstellungsnachweis steht in [Musik-Webprüfung](music-web-validation.md).
+
+Video mit synchronem Ton ist als optionaler Vorschau-Modus im selben Musik-Webbereich verfügbar. Einrichtung, zusätzliche Pelican-UDP-Allocations und Grenzen: [Video-Bots](video.md).
