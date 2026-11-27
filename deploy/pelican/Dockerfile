@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && /opt/yt-dlp/bin/pip install --no-cache-dir "yt-dlp[default]==${YT_DLP_VERSION}" \
     && /opt/yt-dlp/bin/pip check \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --create-home --home-dir /home/container --shell /bin/bash --uid 1000 container
+    && useradd --create-home --home-dir /home/container --shell /bin/bash container
 COPY --from=runtime-node /usr/local/bin/node /usr/local/bin/node
 COPY --from=build /source/build/install/cerberus-ts /opt/cerberus/app
 COPY --from=build /source/examples/welcome-plugin/build/libs/welcome-plugin.jar /opt/cerberus/bundled/welcome-plugin.jar
