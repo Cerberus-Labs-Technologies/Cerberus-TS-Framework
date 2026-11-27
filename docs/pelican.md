@@ -84,6 +84,7 @@ Der Workflow verändert keine Package-Sichtbarkeit.
    Webinterface unter Umständen bereits erreichbar, der Bot aber noch nicht bereit.
 7. In der Panel-Konsole **`web-token`** eingeben. Das ausgegebene Token ist 24 Stunden gültig.
    Das Webinterface unter `http://NODE-IP:ALLOCATION` öffnen und mit dem Token anmelden.
+   Unter **Channels** und **Gruppen** lassen sich Channel-Einstellungen, Server-/Channelgruppen, Rechte und Zuweisungen bearbeiten, siehe [Webverwaltung](web.md#channels-und-gruppen-verwalten).
    Unter **Musik-Bots** lassen sich bei geladenem `music`-Plugin Voice-Bots und Wiedergabe steuern, siehe [Musiksteuerung](music.md#steuerung-im-webinterface).
    Für dauerhaften Zugriff über das Internet HTTPS über einen Reverse Proxy einrichten.
 

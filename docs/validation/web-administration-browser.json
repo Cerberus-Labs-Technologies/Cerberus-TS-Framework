@@ -1,0 +1,99 @@
+{
+  "mode": "fixture",
+  "date": "2026-11-27T18:06:39.367Z",
+  "results": [
+    {
+      "name": "create channel with topic and description through real HTTP API",
+      "passed": true
+    },
+    {
+      "name": "edit channel settings and redact password from responses",
+      "passed": true
+    },
+    {
+      "name": "polling preserves channel drafts and stale save is rejected",
+      "passed": true
+    },
+    {
+      "name": "move a channel and update channel permissions",
+      "passed": true
+    },
+    {
+      "name": "create and rename a server group copied from an existing group",
+      "passed": true
+    },
+    {
+      "name": "edit server group rights with negated and skip and assign offline client",
+      "passed": true
+    },
+    {
+      "name": "group deletion reports existing members and requires explicit force",
+      "passed": true
+    },
+    {
+      "name": "channel groups can be created assigned and reset to server default",
+      "passed": true
+    },
+    {
+      "name": "query groups are visibly read only and group switching never reuses old editor",
+      "passed": true
+    },
+    {
+      "name": "Channels editor layout and navigation at 1440px",
+      "passed": true
+    },
+    {
+      "name": "Gruppen editor layout and navigation at 1440px",
+      "passed": true
+    },
+    {
+      "name": "Channels editor layout and navigation at 1024px",
+      "passed": true
+    },
+    {
+      "name": "Gruppen editor layout and navigation at 1024px",
+      "passed": true
+    },
+    {
+      "name": "Channels editor layout and navigation at 820px",
+      "passed": true
+    },
+    {
+      "name": "Gruppen editor layout and navigation at 820px",
+      "passed": true
+    },
+    {
+      "name": "Channels editor layout and navigation at 768px",
+      "passed": true
+    },
+    {
+      "name": "Gruppen editor layout and navigation at 768px",
+      "passed": true
+    },
+    {
+      "name": "Channels editor layout and navigation at 390px",
+      "passed": true
+    },
+    {
+      "name": "Gruppen editor layout and navigation at 390px",
+      "passed": true
+    },
+    {
+      "name": "Channels editor layout and navigation at 320px",
+      "passed": true
+    },
+    {
+      "name": "Gruppen editor layout and navigation at 320px",
+      "passed": true
+    },
+    {
+      "name": "read token can open both editors but cannot persist changes",
+      "passed": true
+    },
+    {
+      "name": "occupied channel cannot be deleted and own empty channel can be deleted",
+      "passed": true
+    }
+  ],
+  "uncaught": []
+}

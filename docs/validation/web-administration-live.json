@@ -1,0 +1,1 @@
+{"version":"6.0.0-beta14","passed":true,"checks":["channel create/read/update/conflict/move","channel permission set/read/remove","server group create/rename/permissions/copy/empty-members/delete","channel group create/rename/permissions/copy/empty-members/delete","empty channel delete"],"cleanupFailures":[],"realClientMembershipsChanged":false}

@@ -46,7 +46,11 @@ child.stderr.pipe(process.stderr);
 let saved = false;
 let completedAfterBrowserClose = false;
 child.stdout.on("data", (data) => {
-  if (String(data).includes(`saved ${output} (`)) saved = true;
+  if (String(data).includes(`saved ${output} (`)) {
+    saved = true;
+    // Capture is complete. Release only the browser created by this Taste process.
+    if (browser?.isConnected()) void browser.close().catch(() => {});
+  }
 });
 let exitCode;
 const exited = new Promise((resolve) => {
@@ -122,6 +126,18 @@ try {
           "aria-busy",
           "false",
         );
+    }
+    if (metadata.mode === "fixture" && route === "/channels") {
+      await page.locator(".channel-name").first().click();
+      await expect(
+        page.getByLabel("Channel-Name", { exact: true }),
+      ).toBeVisible();
+    }
+    if (metadata.mode === "fixture" && route === "/groups") {
+      await page.locator(".admin-list-item").first().click();
+      await expect(
+        page.getByLabel("Gruppenname", { exact: true }),
+      ).toBeVisible();
     }
     await expect(page.locator(".connection-label")).toHaveText("Verbunden");
     console.log(

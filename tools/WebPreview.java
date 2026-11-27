@@ -12,39 +12,13 @@ import java.io.*;
 
 /** Local QA harness. Live mode has no plugins and rejects every server mutation. */
 public class WebPreview {
-  private static final class Fixture implements QueryConnection {
-    private boolean open = true;
-    public boolean isOpen() { return open; }
-    public boolean getSupportsNotifications() { return true; }
-    public QueryResponse execute(QueryCommand command) {
-      var rows = switch(command.getName()) {
-        case "version" -> List.of(Map.of("version", "6.0.0-beta14"));
-        case "whoami" -> List.of(Map.of("client_id", "99", "virtualserver_id", "1"));
-        case "serverinfo" -> List.of(Map.of("virtualserver_port", "24871", "virtualserver_name", "Lokaler UI-Integrationstest", "virtualserver_maxclients", "16", "virtualserver_clientsonline", "3", "virtualserver_queryclientsonline", "1"));
-        case "clientlist" -> List.of(
-          Map.of("clid", "11", "cid", "1", "client_database_id", "7", "client_unique_identifier", "fixture-alice", "client_nickname", "UI-Testnutzer", "client_servergroups", "6"),
-          Map.of("clid", "12", "cid", "2", "client_database_id", "8", "client_unique_identifier", "fixture-bot", "client_nickname", "Musik-Testclient", "client_servergroups", "6"),
-          Map.of("clid", "99", "cid", "1", "client_type", "1", "client_nickname", "Test-Query"));
-        case "channellist" -> List.of(
-          Map.of("cid", "1", "pid", "0", "channel_name", "Lobby", "total_clients", "1"),
-          Map.of("cid", "2", "pid", "1", "channel_name", "Musik", "total_clients", "1"),
-          Map.of("cid", "3", "pid", "0", "channel_name", "Support", "total_clients", "0"));
-        case "use", "clientupdate", "servernotifyregister", "servernotifyunregister", "sendtextmessage" -> List.<Map<String,String>>of();
-        default -> throw new IllegalStateException("Unexpected fixture command: " + command.getName());
-      };
-      return new QueryResponse(rows, new QueryError(0, "ok", Map.of()));
-    }
-    public AutoCloseable onNotification(kotlin.jvm.functions.Function1<? super QueryNotification,kotlin.Unit> callback) { return () -> {}; }
-    public AutoCloseable onDisconnect(kotlin.jvm.functions.Function1<? super Throwable,kotlin.Unit> callback) { return () -> {}; }
-    public void close() { open = false; }
-  }
   private static QueryConnection readOnly(ConnectionConfig config) {
     var connection = QueryConnections.INSTANCE.open(config);
     return new QueryConnection() {
       public boolean isOpen() { return connection.isOpen(); }
       public boolean getSupportsNotifications() { return connection.getSupportsNotifications(); }
       public QueryResponse execute(QueryCommand command) {
-        if (!Set.of("version", "use", "whoami", "clientupdate", "servernotifyregister", "servernotifyunregister", "serverinfo", "clientlist", "channellist", "clientinfo").contains(command.getName()))
+        if (!Set.of("version", "use", "whoami", "clientupdate", "servernotifyregister", "servernotifyunregister", "serverinfo", "clientlist", "channellist", "clientinfo", "channelinfo", "servergrouplist", "channelgrouplist", "servergrouppermlist", "channelgrouppermlist", "channelpermlist", "permissionlist", "servergroupclientlist", "channelgroupclientlist").contains(command.getName()))
           throw new IllegalStateException("Live web preview is read-only: " + command.getName());
         return connection.execute(command);
       }
@@ -74,7 +48,7 @@ public class WebPreview {
     environment.put("CERBERUS_WEB_ENABLED", "true"); environment.put("CERBERUS_NICKNAME", "Cerberus Web Preview");
     if (mode.equals("fixture")) environment.put("CERBERUS_PASSWORD", "local-fixture-only");
     var config = BotConfig.Companion.load(mode.equals("live") ? Path.of("config/music-live.properties") : base.resolve("unused.properties"), environment);
-    var fixture = new Fixture();
+    QueryConnection fixture = mode.equals("fixture") ? (QueryConnection) Class.forName("labs.cerberus.ts.AdministrationFixture").getConstructor().newInstance() : null;
     try (var bot = new CerberusBot(config, mode.equals("fixture") ? new VoiceProvider() {
       private int next = 100;
       public String getId() { return "ui-fixture"; }
@@ -99,8 +73,8 @@ public class WebPreview {
       var verbs = Set.of("GET", "PUT", "POST", "PATCH", "DELETE");
       var scopes = new HashSet<String>();
       for (var verb : verbs) { scopes.add(verb+" /api/web/*"); scopes.add(verb+" /api/plugins/*"); }
-      var admin = bot.getTokens().generate(scopes, Duration.ofHours(2));
-      var read = bot.getTokens().generate(Set.of("GET /api/web/*", "GET /api/plugins/*"), Duration.ofHours(2));
+      var admin = bot.getTokens().generate(scopes, Duration.ofHours(8));
+      var read = bot.getTokens().generate(Set.of("GET /api/web/*", "GET /api/plugins/*"), Duration.ofHours(8));
       if (mode.equals("fixture")) {
         var web = Objects.requireNonNull(bot.getWeb());
         page(web, "slow", "Verspäteter Inhalt", "export async function mount(root){root.textContent='Wird vorbereitet';await new Promise(r=>setTimeout(r,700));root.textContent='Verspäteter Inhalt';return()=>{}}", false);

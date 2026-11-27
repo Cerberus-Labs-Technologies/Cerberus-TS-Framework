@@ -12,6 +12,59 @@ Die HTML-Seite und ausdrücklich registrierte Assets sind öffentlich. API-Aufru
 
 Das gebündelte Musik-Plugin ergänzt die Seite **Musik-Bots** mit Bot-Verbindungen, Wiedergabe, Queue, Lautstärke und Channelwechsel. Die Bedienung und API stehen in [Musik-Bots](music.md#steuerung-im-webinterface).
 
+## Channels und Gruppen verwalten
+
+**Channels** zeigt die aktuelle Hierarchie. Nach Auswahl lassen sich Name, Thema, Beschreibung,
+Channel-Typ, Client-Limit, Audio-Codec, Qualität, benötigte Talk-Power und Passwort bearbeiten.
+Mit **Neuer Channel** wird ein Channel angelegt; Position und Vorgänger werden über das eigene
+Formular **Channel verschieben** geändert. −1 beim Client-Limit bedeutet unbegrenzt.
+Passwörter werden niemals zurückgegeben. Nur **Passwort ändern** setzt ein neues Passwort;
+ein dann leeres Feld entfernt es. Belegte Channels und Channels mit Unterchannels werden nicht gelöscht.
+
+Unter **Gruppen** gibt es Server- und Channelgruppen. Normale Gruppen lassen sich erstellen,
+umbenennen, kopieren und löschen. Neue Gruppen erhalten die Servervorgaben von TeamSpeak.
+Vorlagen- und Query-Gruppen sind schreibgeschützt; Vorlagen dürfen als Kopierquelle dienen.
+Gesetzte Rechte lassen sich suchen, ändern oder entfernen. Das Formular zum Setzen verwendet
+Namen oder IDs aus dem aktuellen Rechtekatalog. Negated und Skip stehen nur bei Servergruppen zur Verfügung.
+
+Mitglieder werden über ihre **Client-Datenbank-ID** zugewiesen, einschließlich Offline-Clients.
+Die Liste bietet IDs der verbundenen Clients an. Channelgruppen benötigen zusätzlich einen Channel;
+**Zurücksetzen** setzt eine explizite Zuweisung auf die Standard-Channelgruppe des Servers zurück.
+Gruppen mit Zuweisungen werden nur gelöscht, wenn **Auch vorhandene Zuweisungen entfernen** gewählt wurde.
+
+Webzugriff verwendet die Bearer-Scopes des Tokens. `web-token` erlaubt Verwaltungsaktionen;
+ein reines GET-Token liest weiter, kann aber keine Änderungen speichern (HTTP 401).
+Zusätzlich gelten alle TeamSpeak-Rechte der Query-Verbindung. Fehlende Query-Rechte ergeben HTTP 403.
+Gleichzeitige Verwaltungsaktionen, veraltete Channel-Entwürfe und serverseitige Konflikte ergeben HTTP 409.
+Formularentwürfe bleiben beim Polling erhalten; **Daten aktualisieren** lädt sie ausdrücklich neu.
+
+Falls das `server-setup`-Plugin ein Objekt verwaltet, muss seine Konfiguration ebenfalls angepasst werden:
+sein nächster Abgleich kann manuelle Webänderungen sonst zurücksetzen oder gelöschte Objekte wieder anlegen.
+Diese Oberfläche ändert die YAML-Konfiguration des Setup-Plugins nicht.
+
+Die geschützte API liegt unter `/api/web`:
+
+| Methode | Pfad | Wirkung |
+| --- | --- | --- |
+| GET | `/channels/{id}` | Bearbeitbare Channel-Details und Revision, ohne Passwort |
+| POST | `/channels` | Channel erstellen: `name`, optional `parentId`, `order` und Einstellungen |
+| PUT | `/channels/{id}` | Angegebene Einstellungen ändern, optional `expectedRevision` prüfen |
+| POST | `/channels/{id}/move` | `parentId` und `order` (Vorgänger-ID oder 0) setzen |
+| DELETE | `/channels/{id}` | Leeren Channel löschen; Body mit `expectedName` erforderlich |
+| GET / POST | `/groups/{kind}` | Gruppen lesen / normale Gruppe erstellen; `kind`: `server` oder `channel` |
+| PUT / DELETE | `/groups/{kind}/{id}` | Umbenennen / löschen; Umbenennen unterstützt `expectedName`, Löschen verlangt es und optional `force` |
+| GET | `/permission-catalog` | Aktuelle Permission-IDs, Namen und Beschreibungen |
+| GET | `/permissions/{kind}/{id}` | Gesetzte Rechte; `kind`: `channel`, `server-group`, `channel-group` |
+| PUT / DELETE | `/permissions/{kind}/{id}/{permissionId}` | Recht setzen / entfernen; Setzen: `value`, für Servergruppen optional `negated`, `skip` |
+| GET / POST | `/groups/{kind}/{id}/members` | Zuweisungen lesen / `databaseId` zuweisen, bei Channelgruppen zusätzlich `channelId` |
+| DELETE | `/groups/server/{id}/members/{databaseId}` | Servergruppen-Mitglied entfernen |
+| DELETE | `/groups/channel/{id}/members/{databaseId}/{channelId}` | Explizite Channelgruppen-Zuweisung auf Serverstandard zurücksetzen |
+
+Channel-Einstellungen: `name`, `topic`, `description`, `lifetime` (`permanent`, `semi`, `temporary`),
+`maxClients`, `codec`, `codecQuality`, `neededTalkPower`, `newPassword`.
+Gruppen-Erstellung: `name`, optional `copyFrom`; Kopien erzeugen ausschließlich neue normale Gruppen.
+Es gibt keinen freien Query-Befehl oder allgemeine Parameterweiterleitung in dieser API.
+
 ## Seite aus einem Paper-artigen Plugin registrieren
 
 Das vollständige Beispiel ist das [Welcome-Plugin](../examples/welcome-plugin). Es liefert eine Einstellungsseite samt tatsächlich speichernder API aus.
@@ -57,16 +110,16 @@ Ein Plugin muss Ressourcen, die es bereits vor einem fehlgeschlagenen `mount` an
 
 ## Reproduzierbare Bedienprüfung
 
-`tools/WebPreview.java` startet die gebaute Distribution mit echten HTTP-APIs und entweder einem lokalen Query-Fixture (`fixture`) oder einer ausschließlich lesenden TS6-Verbindung ohne Plugins (`live`). Die tatsächlichen Welcome- und Musik-JARs werden nur im Fixture-Modus geladen. Die Voice-Verbindungen des Musikdienstes werden dort durch lokale Testverbindungen ersetzt; FFmpeg und die HTTP-APIs bleiben echt. Der Harness schreibt seine kurzlebigen Testtokens in eine private temporäre Datei und gibt ausschließlich deren Pfad aus.
+`tools/WebPreview.java` startet die gebaute Distribution mit echten HTTP-APIs und entweder einem lokalen Query-Fixture (`fixture`) oder einer ausschließlich lesenden TS6-Verbindung ohne Plugins (`live`). Die tatsächlichen Welcome- und Musik-JARs werden nur im Fixture-Modus geladen. Die Voice-Verbindungen des Musikdienstes werden dort durch lokale Testverbindungen ersetzt; FFmpeg und die HTTP-APIs bleiben echt. Der Fixture-Modus lädt `AdministrationFixture` aus den Testklassen; seine Channels, Gruppen und Rechte bleiben vollständig lokal. Der Harness schreibt seine auf acht Stunden begrenzten Testtokens in eine private temporäre Datei und gibt ausschließlich deren Pfad aus.
 
 `web/scripts/browser-check.mjs <metadata.json> <report.json>` prüft die Anmeldung, Suche, Navigation, Fehlerwiederholung und Abmeldung bei 1440, 1024, 820, 768, 390 und 320 Pixeln. Im Fixture-Modus prüft es zusätzlich Speichern, eingeschränkte Tokens, asynchrones Einbinden, Stylesheet-Fehler, Cleanup-Fehler und Request-Abbruch. Es benötigt `npm ci` sowie einen Playwright-Browser oder `CERBERUS_BROWSER` mit einem Chromium-Pfad. Berichte enthalten keine Tokens.
 
 Vom Repository-Verzeichnis aus lässt sich der lokale Harness so starten:
 
 ```sh
-./gradlew :examples:welcome-plugin:jar :examples:music-plugin:jar installDist -Pcerberus.install.dir=build/install/cerberus-ts-web-preview
+./gradlew testClasses :examples:welcome-plugin:jar :examples:music-plugin:jar installDist -Pcerberus.install.dir=build/install/cerberus-ts-web-preview
 javac -cp 'build/install/cerberus-ts-web-preview/lib/*' -d /private/tmp tools/WebPreview.java
-java -cp '/private/tmp:build/install/cerberus-ts-web-preview/lib/*' WebPreview fixture
+java -cp '/private/tmp:build/classes/java/test:build/install/cerberus-ts-web-preview/lib/*' WebPreview fixture
 ```
 
 Die Harness-Konsole mit `stop` beenden. Der ausgegebene Metadatenpfad ist das erste Argument des Browserprüfers, der aus `web/` ausgeführt wird. `live` statt `fixture` verwendet die lokale, nicht versionierte Datei `config/music-live.properties`; dieser Modus verbindet eine zusätzliche lesende Query-Sitzung und lädt keine Plugins. Die normale laufende Musik-Instanz wird dadurch nicht ersetzt.
@@ -76,3 +129,5 @@ Für angemeldete Taste-Aufnahmen hängt sich `web/scripts/shoot-auth.mjs` aussch
 Diese Funktionstests ersetzen weder visuelle Prüfung noch die Prüfung jeder künftigen Plugin-Seite. Taste-Auswahl und Darstellungsnachweise stehen in [web/DESIGN.md](../web/DESIGN.md).
 
 `web/scripts/music-check.mjs <metadata.json> <report.json>` prüft zusätzlich die Musiksteuerung mit tatsächlicher lokaler WAV-Dekodierung, Bot-Lebenszyklus, Lesetoken, Polling und sechs Bildschirmbreiten. Dieser mutierende Test akzeptiert ausschließlich den Fixture-Modus. FFmpeg muss im PATH der Vorschau liegen.
+
+`web/scripts/administration-check.mjs <metadata.json> <report.json>` prüft Channel-/Gruppenformulare, Rechte, Zuweisungen, Speicherkonflikte, Lesetokens und sechs Bildschirmbreiten gegen das lokale Fixture. Der mutierende Prüfer lehnt den Live-Modus ab.

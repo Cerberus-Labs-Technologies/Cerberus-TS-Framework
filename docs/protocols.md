@@ -77,3 +77,7 @@ Sie prüfen den Client gegen modellierte Protokollantworten. Zusätzlich wurden 
 Serverabfragen, Beispiel-Plugin und private Nachrichtenbenachrichtigungen gegen einen laufenden TS6-beta14-Server geprüft;
 Umfang und verbleibende Grenzen stehen in [Validierung](validation.md).
 Serverseitige Details vor Produktiveinsatz mit `help <command>` auf der eingesetzten Version prüfen.
+
+## Webverwaltung: zusätzlicher TS6-Nachweis
+
+Die Verwaltungs-API wurde zusätzlich gegen TS6 beta14 mit ausschließlich eigenen temporären Channels und Gruppen geprüft: Channel-CRUD, Revisionenkonflikt, Verschieben, Channelrechte, Server-/Channelgruppen anlegen/umbenennen/kopieren/löschen und Gruppenrechte setzen/lesen/entfernen. Neue Gruppen können bereits Server-Standardrechte enthalten. Kopien werden auf das Vorhandensein der gesetzten Rechte geprüft, nicht auf eine fest angenommene Anzahl. Alle Testobjekte wurden ohne Force-Löschung wieder entfernt; bestehende Gruppen und echte Client-Zuweisungen blieben unverändert. [Live-Ergebnis](validation/web-administration-live.json). Mitgliedschaftsänderungen und das Zurücksetzen auf die Standard-Channelgruppe sind gegen einen zustandsbehafteten Query-Testpartner und das mitgelieferte `setclientchannelgroup`-Handbuch geprüft, nicht an echten Benutzern.

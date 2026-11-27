@@ -51,7 +51,10 @@ COMMANDS = {
     "channelgroupaddperm": {"cgid", "permsid", "permvalue"},
     "channelgroupdelperm": {"cgid", "permsid"},
     "channelgrouppermlist": {"cgid"},
-    "channelgroupclientlist": {"cgid"},
+    "channelgroupclientlist": {"cgid", "cid", "cldbid"},
+    "setclientchannelgroup": {"cgid", "cid", "cldbid"},
+    "servergroupaddclient": {"sgid", "cldbid"},
+    "servergroupdelclient": {"sgid", "cldbid"},
 }
 
 

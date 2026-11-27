@@ -2,6 +2,8 @@
 
 ## 2.0.0-SNAPSHOT
 
+- Webverwaltung für Channels, Server-/Channelgruppen, Rechtekatalog und Client-Zuweisungen; Revisionen schützen Channel-Entwürfe vor unbemerktem Überschreiben. TS6-CRUD separat an eigenen Testobjekten geprüft.
+
 - Musiksteuerung als Plugin-Seite im Webinterface: Bots verbinden/trennen, Wiedergabe und Queue, Pause/Skip/Stop, Lautstärke, Channelwechsel und Titel-/Fehlerstatus; geschützte HTTP-API mit Plugin-Lebenszyklus.
 
 - Pelican-Eggs für PLCN_v3/PTDL_v2, Container-Image mit Musik-Werkzeugen und GitHub-Packages-Workflow; persistente Serverdaten und konsolenunabhängiges Bereitschaftssignal.

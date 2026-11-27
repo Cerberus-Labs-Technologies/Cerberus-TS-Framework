@@ -9,7 +9,10 @@ import labs.cerberus.ts.service.RestService
 /** Shared administration data. Plugin-specific actions use each plugin's own /api/plugins namespace. */
 class WebControlApi(private val bot: CerberusBot, rest: RestService, private val plugins: () -> List<PluginDescriptor>) : AutoCloseable {
     private val scope = ResourceScope()
-    init { scope.own(rest.registerController(Controller())) }
+    init {
+        scope.own(rest.registerController(Controller()))
+        scope.own(WebAdministrationApi(bot.server, rest))
+    }
     @RestController("/api/web")
     inner class Controller {
         @RequestMapping(RequestMethod.GET, "/status")

@@ -1,3 +1,4 @@
+import { ChannelEditor, GroupsPage } from "@/components/Administration";
 import {
   useCallback,
   useEffect,
@@ -659,15 +660,23 @@ function ChannelsPage({ api, refresh }: { api: Api; refresh: number }) {
   const channels = useResource<Channel[]>(api, "/api/web/channels", refresh);
   const clients = useResource<Client[]>(api, "/api/web/clients", refresh);
   const [selected, setSelected] = useState<number>();
+  const [creating, setCreating] = useState(false);
+  const [notice, setNotice] = useState("");
   const channel = channels.data?.find((item) => item.id === selected);
   return (
-    <div className="overview-grid">
+    <div className="admin-layout">
       <section className="panel">
         <div className="panel-heading">
           <h2>Channelstruktur</h2>
-          <span className="text-sm text-muted-foreground">
-            {channels.data?.length ?? 0} Channels
-          </span>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setCreating(true);
+              setSelected(undefined);
+            }}
+          >
+            Neuer Channel
+          </Button>
         </div>
         <InlineError message={channels.error} retry={channels.retry} />
         {!channels.data && channels.loading ? (
@@ -677,42 +686,46 @@ function ChannelsPage({ api, refresh }: { api: Api; refresh: number }) {
             channels={channels.data}
             clients={clients.data ?? []}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={(id) => {
+              setSelected(id);
+              setCreating(false);
+            }}
           />
         ) : (
           <Empty title="Keine Channels geladen">
-            Prüfe die TeamSpeak-Verbindung.
+            Prüfe die TeamSpeak-Verbindung oder erstelle einen Channel.
           </Empty>
         )}
       </section>
       <section className="panel h-fit">
+        <p role="status" className="admin-notice px-6 pt-4">
+          {notice}
+        </p>
         <div className="panel-heading">
-          <h2>Channel-Details</h2>
+          <h2>{creating ? "Channel erstellen" : "Channel-Details"}</h2>
+          {channel && <div className="admin-actions"><span className="admin-current-name">{channel.name}</span><Badge variant="outline">#{channel.id}</Badge></div>}
         </div>
-        {channel ? (
-          <div className="p-6">
-            <p className="text-xl font-medium">{channel.name}</p>
-            <dl className="detail-list">
-              <div>
-                <dt>Channel-ID</dt>
-                <dd>#{channel.id}</dd>
-              </div>
-              <div>
-                <dt>Parent</dt>
-                <dd>
-                  {channels.data?.find((item) => item.id === channel.parentId)
-                    ?.name ?? "Root"}
-                </dd>
-              </div>
-              <div>
-                <dt>Verbundene Clients</dt>
-                <dd>{channel.clients ?? 0}</dd>
-              </div>
-            </dl>
-          </div>
+        {creating || channel ? (
+          <ChannelEditor
+            key={`${creating ? "new" : selected}-${refresh}`}
+            api={api}
+            channel={creating ? undefined : channel}
+            channels={channels.data ?? []}
+            onSaved={(id) => {
+              setSelected(id);
+              setCreating(false);
+              setNotice("Channel gespeichert.");
+              channels.retry();
+            }}
+            onDeleted={() => {
+              setSelected(undefined);
+              setNotice("Channel gelöscht.");
+              channels.retry();
+            }}
+          />
         ) : (
           <Empty title="Wähle einen Channel">
-            Klicke links auf einen Namen, um die Details anzuzeigen.
+            Klicke links auf einen Namen, um die Details zu bearbeiten.
           </Empty>
         )}
       </section>
@@ -816,6 +829,7 @@ function Workspace({
     { path: "/", label: "Übersicht", icon: DashboardIcon },
     { path: "/clients", label: "Clients", icon: PersonIcon },
     { path: "/channels", label: "Channels", icon: SpeakerLoudIcon },
+    { path: "/groups", label: "Gruppen", icon: PersonIcon },
     { path: "/plugins", label: "Plugins", icon: CubeIcon },
   ];
   const pluginPage = pages.data?.find(
@@ -1000,10 +1014,12 @@ function Workspace({
                     : path === "/clients"
                       ? "Benutzer und Voice-Bots auf deinem TeamSpeak-Server."
                       : path === "/channels"
-                        ? "Alle Channels mit ihrer Hierarchie und Belegung."
-                        : path === "/plugins"
-                          ? "Die Erweiterungen deiner Cerberus-Instanz."
-                          : "Diese Seite ist nicht mehr registriert.")}
+                        ? "Channels erstellen, bearbeiten, verschieben und Rechte verwalten."
+                        : path === "/groups"
+                          ? "Server- und Channelgruppen, Rechte und Zuweisungen verwalten."
+                          : path === "/plugins"
+                            ? "Die Erweiterungen deiner Cerberus-Instanz."
+                            : "Diese Seite ist nicht mehr registriert.")}
               </p>
             </div>
             <Button
@@ -1057,6 +1073,8 @@ function Workspace({
             <ClientsPage api={api} refresh={refresh} />
           ) : path === "/channels" ? (
             <ChannelsPage api={api} refresh={refresh} />
+          ) : path === "/groups" ? (
+            <GroupsPage api={api} refresh={refresh} />
           ) : path === "/plugins" ? (
             <PluginsPage api={api} refresh={refresh} pages={pages.data ?? []} />
           ) : (
