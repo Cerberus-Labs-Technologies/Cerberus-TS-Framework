@@ -124,10 +124,19 @@ java -cp '/private/tmp:build/classes/java/test:build/install/cerberus-ts-web-pre
 
 Die Harness-Konsole mit `stop` beenden. Der ausgegebene Metadatenpfad ist das erste Argument des Browserprüfers, der aus `web/` ausgeführt wird. `live` statt `fixture` verwendet die lokale, nicht versionierte Datei `config/music-live.properties`; dieser Modus verbindet eine zusätzliche lesende Query-Sitzung und lädt keine Plugins. Die normale laufende Musik-Instanz wird dadurch nicht ersetzt.
 
-Für angemeldete Taste-Aufnahmen hängt sich `web/scripts/shoot-auth.mjs` ausschließlich an den vom unveränderten Taste-Skript gestarteten Browser und bedient das normale Loginformular. Ein frisches Profil pro Aufnahme verhindert Verwechslungen mit wiederhergestellten Tabs. Erst nach gespeicherter PNG und bestätigtem Schließen dieses Browsers beendet der Helfer gegebenenfalls dessen zurückgebliebenen Nodeprozess. Er verändert weder Anwendung noch Prüftool und startet keinen zweiten Browser. Metadaten, Browserprofile und Aufnahmen bleiben lokale QA-Artefakte.
+Für angemeldete Taste-Aufnahmen hängt sich `web/scripts/shoot-auth.mjs` ausschließlich an den vom unveränderten Taste-Skript gestarteten Browser und bedient das normale Loginformular. Ein frisches Profil pro Aufnahme verhindert Verwechslungen mit wiederhergestellten Tabs. Nach gespeicherter PNG schließt der Helfer ausschließlich diesen Browser. Dessen PID stammt aus seiner eigenen CDP-Sitzung; ein beim Abschluss hängender Prozess wird nach fünf Sekunden gezielt beendet. Erst nach bestätigtem Browserende wird gegebenenfalls der zurückgebliebene zugehörige Nodeprozess beendet. Er verändert weder Anwendung noch Prüftool und startet keinen zweiten Browser. Metadaten, Browserprofile und Aufnahmen bleiben lokale QA-Artefakte.
 
 Diese Funktionstests ersetzen weder visuelle Prüfung noch die Prüfung jeder künftigen Plugin-Seite. Taste-Auswahl und Darstellungsnachweise stehen in [web/DESIGN.md](../web/DESIGN.md).
 
 `web/scripts/music-check.mjs <metadata.json> <report.json>` prüft zusätzlich die Musiksteuerung mit tatsächlicher lokaler WAV-Dekodierung, Bot-Lebenszyklus, Lesetoken, Polling und sechs Bildschirmbreiten. Dieser mutierende Test akzeptiert ausschließlich den Fixture-Modus. FFmpeg muss im PATH der Vorschau liegen.
 
 `web/scripts/administration-check.mjs <metadata.json> <report.json>` prüft Channel-/Gruppenformulare, Rechte, Zuweisungen, Speicherkonflikte, Lesetokens und sechs Bildschirmbreiten gegen das lokale Fixture. Der mutierende Prüfer lehnt den Live-Modus ab.
+
+Für einen ausdrücklich freigegebenen TS6-Testserver lässt sich der Probeaufruf aus `tools/WebAdministrationLive.java` reproduzieren:
+
+```sh
+javac -cp 'build/install/cerberus-ts-web-preview/lib/*' -d /private/tmp tools/WebAdministrationLive.java
+java -cp '/private/tmp:build/install/cerberus-ts-web-preview/lib/*' WebAdministrationLive --allow-live config/music-live.properties
+```
+
+Ohne `--allow-live` startet der Prüfer nicht. Er erstellt ausschließlich eindeutig benannte eigene Testchannels und -gruppen, prüft CRUD/Kopien/Rechte und entfernt sie wieder ohne Force. Er ändert keine Mitgliedschaften echter Clients. Die Konfiguration muss auf den vorgesehenen Testserver zeigen und einen verifizierten SSH-Host-Key verwenden. Zugangsdaten und Webtoken werden nicht ausgegeben.

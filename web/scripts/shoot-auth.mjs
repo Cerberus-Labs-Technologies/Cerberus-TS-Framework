@@ -44,10 +44,12 @@ const child = spawn(
 child.stdout.pipe(process.stdout);
 child.stderr.pipe(process.stderr);
 let saved = false;
+let savedAt = 0;
 let completedAfterBrowserClose = false;
 child.stdout.on("data", (data) => {
   if (String(data).includes(`saved ${output} (`)) {
     saved = true;
+    savedAt = Date.now();
     // Capture is complete. Release only the browser created by this Taste process.
     if (browser?.isConnected()) void browser.close().catch(() => {});
   }
@@ -61,6 +63,25 @@ const exited = new Promise((resolve) => {
 });
 const watchdog = setTimeout(() => child.kill("SIGTERM"), 540_000);
 let browser;
+let browserPid;
+// CDP can already be disconnected before its one-shot event is observed.
+// End only our exact Taste Node child after capture AND confirmed browser closure.
+const release = setInterval(() => {
+  if (!saved || exitCode !== undefined) return;
+  let browserExited = false;
+  if (browserPid) {
+    try {
+      process.kill(browserPid, 0);
+      if (Date.now() - savedAt > 5000) process.kill(browserPid, "SIGTERM");
+    } catch (error) {
+      if (error.code === "ESRCH") browserExited = true;
+    }
+  }
+  if (browserExited || (browser && !browser.isConnected())) {
+    completedAfterBrowserClose = true;
+    child.kill("SIGTERM");
+  }
+}, 500);
 try {
   let port;
   const deadline = Date.now() + 20_000;
@@ -79,6 +100,12 @@ try {
   browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`, {
     timeout: 10_000,
   });
+  const session = await browser.newBrowserCDPSession();
+  const processes = await session.send("SystemInfo.getProcessInfo");
+  browserPid = processes.processInfo.find(
+    (process) => process.type === "browser",
+  )?.id;
+  await session.detach();
   browser.once("disconnected", () => {
     // shoot.mjs closes Chrome in its finally block but can retain a Node WebSocket handle.
     // Only end that exact child after the saved-image message AND browser disconnection.
@@ -167,4 +194,5 @@ try {
   );
 } finally {
   clearTimeout(watchdog);
+  clearInterval(release);
 }
