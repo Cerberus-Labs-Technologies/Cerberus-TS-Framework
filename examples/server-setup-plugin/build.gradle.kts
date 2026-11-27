@@ -11,7 +11,7 @@ dependencies {
     compileOnly(project(":"))
     testImplementation(project(":"))
     testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.14.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.14.1")
 }
 tasks.test {
