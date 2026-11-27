@@ -1,0 +1,13 @@
+name: server-setup
+version: '2.0.0'
+main: example.setup.ServerSetupPlugin
+api-version: '2.0'
+author: Cerberus Labs
+description: Deklarative Servereinrichtung mit Channels, Server- und Channelgruppen
+commands:
+  setup:
+    description: Serveraufbau prüfen oder abgleichen
+    usage: '<command> status|plan|apply'
+    aliases: [einrichtung]
+    permission: cerberus.setup.admin
+    permission-message: 'Dir fehlt die Berechtigung cerberus.setup.admin.'

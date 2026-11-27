@@ -3,7 +3,7 @@ name: Bug report 🚧
 about: Found a bug? Tell us about it so we can fix it ^^
 title: "[🚧] <What is this report about>"
 labels: bug, feedback wanted
-assignees: MarkL4YG
+assignees: ''
 
 ---
 

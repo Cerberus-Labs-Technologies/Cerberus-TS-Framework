@@ -1,105 +1,131 @@
-# JeakBot TeamSpeak 3 Plugin Framework  
-  
----
-  
-# ⚠ PROJECT DISCONTINUED ⚠ #  
-Due to a shortage of spare time to properly maintain this project, development effectively halted in Dec 2020.  
-As of now (Aug 2021), the project is still on hold and cannot be actively maintained.  
-  
-In the future, there might be a re-code of the framework using the Spring framework but for now that's future music.  
-We _may or may not_ occasionally push bug fixes, help with issues/questions or even restart development on the project.  
-  
-Pull requests are still welcome but may take some time to review. (Which is why this repository is not archived at the moment.)  
-  
-  
----
-  
-  
-## TS3 Servers on the next level!
+# Cerberus TS
 
-The JeakBot-Framework connects to the TeamSpeak server using the _TS3 server query interface_.  
-Java plugins can use the API to interact with the TeamSpeak server using the JeakBot-API.  
-Plugins can be programmed in a way that developers may be familiar from [the Sponge plugin API for Minecraft](https://spongepowered.org) as the projects idea is inspired by Sponge.  
+**Entwicklung und Wartung: Cerberus Labs.**
 
-## Badges
-|Type/Name|Badge|URL|
-|---|---|---|
-|License            |![ShieldsIO](https://img.shields.io/github/license/jeakfrw/jeak-framework.svg?color=success&style=flat-square)|[bleeding-1.X.X/LICENSE](https://github.com/jeakfrw/jeak-framework/blob/bleeding-1.X.X/LICENSE)
-|Language           |![ShieldsIO](https://img.shields.io/github/languages/top/jeakfrw/jeak-framework.svg?style=flat-square)|
-|Latest (stable)    |![ShieldsIO](https://img.shields.io/github/tag/jeakfrw/jeak-framework.svg?color=success&style=flat-square)  |[/releases](https://github.com/jeakfrw/jeak-framework/releases)
-|Latest (bleeding)  |![ShieldsIO](https://img.shields.io/github/tag-pre/jeakfrw/jeak-framework.svg?color=yellow&style=flat-square) |[/releases](https://github.com/jeakfrw/jeak-framework/releases)
-|CI (1.X.X-stable)  |[![buddy pipeline](https://app.buddy.works/m-lessmann/jeak-framework/pipelines/pipeline/192846/badge.svg?token=c96165ce0ba77d6a72d2c19083a7078a0041dc98e12de3f29e414d4927762d09 "buddy pipeline")](https://app.buddy.works/m-lessmann/jeak-framework/pipelines/pipeline/192846) |[View on Buddy](https://app.buddy.works/m-lessmann/jeak-framework/pipelines)|
-|CI (1.X.X-bleeding)|[![buddy pipeline](https://app.buddy.works/m-lessmann/jeak-framework/pipelines/pipeline/192314/badge.svg?token=c96165ce0ba77d6a72d2c19083a7078a0041dc98e12de3f29e414d4927762d09 "buddy pipeline")](https://app.buddy.works/m-lessmann/jeak-framework/pipelines/pipeline/192314) |[View on Buddy](https://app.buddy.works/m-lessmann/jeak-framework/pipelines)
-|Automated Code Rev |[![CodeFactor](https://www.codefactor.io/repository/github/jeakfrw/jeak-framework/badge)](https://www.codefactor.io/repository/github/jeakfrw/jeak-framework)|[View on CodeFactor](https://www.codefactor.io/repository/github/jeakfrw/jeak-framework)|
-|Security (Snyk)    |[![Known Vulnerabilities](https://snyk.io/test/github/jeakfrw/jeak-framework/badge.svg)](https://snyk.io/test/github/jeakfrw/jeak-framework) [1]
-|Security (WhiteSrc)|See "Security" tab|[/network/alerts](https://github.com/jeakfrw/jeak-framework/network/alerts)
-|OS-Support         |![ShieldsIO](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20MacOS-informational.svg?style=flat-square)    |
-|Status             |![ShieldsIO](https://img.shields.io/maintenance/yes/2021.svg?style=flat-square)
-|Discord            |![ShieldsIO](https://img.shields.io/discord/533021399560880141.svg?style=flat-square)|[Discord Invite](https://discord.gg/DPYR5aB)|  
+TeamSpeak-Bot- und Plugin-Framework in Kotlin/JVM. Voraussetzung: JDK 21; zum Bauen des Webinterfaces zusätzlich Node.js 22.15+ und npm.
+Der aktive Build enthält ausschließlich Kotlin; der unveränderte Java-Quellstand liegt unter [legacy](legacy/README.md).
 
-> _Note: Although we ignore vulnerabilities that do not apply to our distribution environment, we will apply patches when possible just to address concerns and deviated environments._
+Die Query- und Framework-Kernfunktionen sind neu implementiert und automatisiert geprüft.
+**Die Migration hat noch keine vollständige Funktionsparität mit Jeak 1:** Alte Plugins und Konfigurationsdateien sind nicht direkt kompatibel. SSH-Anmeldung, Serverabfragen, Beispiel-Plugin und Voice-Audio wurden gegen einen echten TS6-beta14-Server geprüft; weitere Grenzen stehen in [Validierung](docs/validation.md).
 
-# Links
-* [Project license](./LICENSE)
-* [Contribution guidelines](./CONTRIBUTING.md)
-* [Changelog](./CHANGELOG)
-* [Releases](https://github.com/jeakfrw/jeak-framework/releases)
-* [Documentation](https://jeakbot.readme.io/)
-* [Current logo](https://github.com/jeakfrw/jeak-framework/blob/bleeding-1.X.X/assets/JeakBot-Beta.png)
-# Contact
-If you want to engage with the developers/community, feel free to join us:
+## Bauen und starten
 
-* Discord Server: https://discord.gg/DPYR5aB
-* E-Mail contact: support@fearnixx.de
+```sh
+./gradlew clean build :examples:welcome-plugin:build
+cp config/cerberus.example.properties config/cerberus.properties
+# Serverdaten und verifizierte known_hosts-Datei konfigurieren.
+export CERBERUS_PASSWORD='...'
+./gradlew run --args='--check-config'
+./gradlew run --args='--console'
+```
 
-For details about the issue section of the GitLab project. See [CONTRIBUTING.md](./CONTRIBUTING.md)
+`./gradlew installDist` erstellt `build/install/cerberus-ts` mit Startskripten und Laufzeitabhängigkeiten.
+ZIP/TAR: `./gradlew distZip distTar`. `--config <datei>` wählt eine andere Konfiguration.
+In der optionalen lokalen Konsole beendet `stop` den Bot; diese Konsole besitzt Administratorrechte.
 
-# Help the project
-If you want to help the project without directly contributing on GitHub, you can donate.  
-Every donor who donated at least 5 € in the past 12 months will be granted the ``Donor`` role on our Discord.
-So make sure to include your Discord name in your donation message :).
+Jeder Konfigurationsschlüssel lässt sich über `CERBERUS_` + Großbuchstaben mit `_` statt `.` überschreiben,
+z. B. `CERBERUS_API_KEY`, `CERBERUS_KNOWN_HOSTS`, `CERBERUS_SERVER_ID`, `CERBERUS_ADMIN_UID`.
+Passwort und API-Key gehören nicht in eine Connection-URI. Die Beispielkonfiguration enthält keine Standardzugangsdaten.
 
-[![ko-fi](https://www.ko-fi.com/img/donate_sm.png)](https://ko-fi.com/F1F0OL0V)
-  
----
-# _Special thanks! / Credit_
-We would like to thank the companies and projects that help us develop, maintain, document, deploy and distribute the project.  
-They are really making work easier for us! :)  
-(Our distribution archives also include information of the libraries in use.)
-  
-### CI / CD: Buddy - _Build better apps faster_.
-Buddy allows us to use their Open Source project plan for both the framework and the [Confort](https://github.com/MarkL4YG/confort) library.  
-Their unique way of CI/CD configuration eliminates the need of unclear and verbose config files and we love the editor-approach.  
-See [https://buddy.works/](https://buddy.works/) for more!  
-<a href="https://buddy.works"><img src="https://assets.fearnixx.de/3rdparty/buddy.works/logo-blue.svg" height="100" width="200" alt="Buddy.Works logo."></img></a>
-  
-### Docs: ReadMe.IO
-ReadMe.IO granted us their OSS project plan to enable us using nearly every feature of their documentation platform for free!  
-If you love documentation as much as we do, take a look over at: [https://readme.io/](https://readme.io/)  
-<a href="https://readme.io"><img src="https://readme.com/static/brandkit/readme-blue.svg" height="50" width="200" alt="ReadMeIO Logo"></img></a>
+## TeamSpeak-Verbindungen
 
-### Nexus: Sonatype
-With Nexus 3 OSS, Sonatype allows us to easily maintain repositories of different types for FearNixx and Jeak which greatly improves our ability to develop and organize software.  
-See [https://www.sonatype.com/nexus-repository-oss](https://www.sonatype.com/nexus-repository-oss) for more information.
-  
-### Repositories: GitHub & GitLab
-We're sure most of you know both platforms but we wanted to explicitly state our thanks to both platforms for allowing us to collaborate, organize and plan more than just software development! :)  
-While the framework is located on GitHub, plugins by FearNixx are hosted over at GitLab.  
-  
-### IDE: JetBrains
-We use and love IntelliJ IDEA for development.  
-We want to thank JetBrains for making the community version free to use and allowing some of us to use educational licenses for our free projects! :)
-  
-### Code collaboration / discussion
-We use CodeStream to collaborate on and discuss code, concepts and bugs.  
-CodeStream kindly allowed us to use their free open source plan so anyone can join and discuss with us! :)  
-<a href="https://codestream.com"><img src="https://assets.fearnixx.de/3rdparty/codestream/codestream-light.svg" height="50" width="200" alt="CodeStream Logo"></img></a>  
-(_We currently only have the light-version of their logo - but dark theme is cooler anyways :sunglasses:_ )
-  
-### Git: GitKraken
-Some of us use GitKraken to interact with and manage Git.  
-GitKraken allows free use for open source projects and we thank them for that. :)  
+| Transport | TS3 | TS6 | Standardport | Push-Events |
+| --- | --- | --- | --- | --- |
+| SSH | ja | ja | 10022 | ja |
+| Raw TCP | ja, explizit konfigurieren | nicht verfügbar | 10011 | ja |
+| WebQuery HTTP | ab Server 3.12 | ja | 10080 | nein |
+| WebQuery HTTPS | ab Server 3.12 | ja | 10443 | nein |
 
-### Server administration: Pterodactyl  
-On our servers, we utilize the free application server management software [Pterodactyl](https://pterodactyl.io).  
-Managing our test systems and environments would be way harder without it!
+SSH ist der Standard. Es nutzt eine Shell ohne PTY und überprüft den Host-Key gegen `known_hosts`.
+Bei einem unbekannten oder abweichenden Schlüssel bricht die Verbindung ab. Den Schlüssel über einen vertrauenswürdigen Kanal mit dem Betreiber abgleichen und dann in `known_hosts` eintragen.
+HTTPS nutzt den Truststore der JVM; es gibt keinen automatischen Rückfall auf Raw TCP.
+
+Für TS6 SSH serverseitig `TSSERVER_QUERY_SSH_ENABLED=1` setzen.
+WebQuery benötigt die entsprechende HTTP-/HTTPS-Konfiguration und einen API-Key mit passenden Rechten.
+Siehe [offizielle TS6-Konfiguration](https://github.com/teamspeak/teamspeak6-server/blob/main/CONFIG.md) und [Protokollabgleich](docs/protocols.md).
+
+## Funktionsumfang
+
+- Serialisierte Query-Requests mit Zeitlimits, Rate-Limit, vollständigem Escaping, mehrzeiligen Antworten und separat zugestellten Events.
+- Verbindungsüberwachung, Keepalive und erneute Initialisierung nach Verbindungsverlust. `reconnect.attempts=0` deaktiviert Wiederholungen; `-1` erlaubt unbegrenzt viele Versuche.
+- Plugin-JARs mit Abhängigkeitsreihenfolge, Service-Injection, Lebenszyklus und automatischer Ressourcenfreigabe.
+- Event-Bus mit Prioritäten und abbrechbaren Events; Chat-/Konsolenbefehle mit Quotes, typisierten Parametern/Optionen, optionalen/alternativen Kriterien, eigenen Matchern und Mindest-Rechten. Siehe [Befehle](docs/commands.md).
+- Persistente Framework-Rechte, Gruppen, Vererbung und Verknüpfung mit TeamSpeak-Servergruppen; UID-basierte Profile mit Zusammenführen und Eigenschaften.
+- Client-/Channel-Abfragen und Cache, Nachrichten, Pokes, Verschieben/Kicken sowie generische Query-API für weitere Server-/Gruppen-/Rechtebefehle.
+- JSON-Batchaufrufe und Serverauswahl über ID oder Voice-Port bei WebQuery; separate Byte-Streams für Upload/Download über SSH/Raw.
+- Scheduler, Lokalisierung, konfigurierbare Hibernate-/Hikari-PersistenceUnits mit verschachtelten JDBC-/ORM-Transaktionen und Transaktionsannotation; siehe [Datenbanken](docs/database.md).
+- Benannte Tasks mit Status und Neuplanung sowie serialisierte/asynchrone Plugin-Scheduler; siehe [Scheduler](docs/scheduler.md).
+- Config-/Locale-/Transport-Injection, kategorisierte JSON-/YAML-Dateien, persistente Übersetzungs-Units und UID-Sprachpräferenzen; siehe [Konfiguration und Lokalisierung](docs/configuration.md).
+- UID-basierte Benachrichtigungen mit Dringlichkeits-/Lebensdauer-Filtern sowie MailBuilder, MIME-Anhängen und benannten asynchronen SMTP-Transporten mit TLS und automatisch geladenen JSON-/YAML-Units; siehe [SMTP](docs/mail.md).
+- Optionaler REST-Server mit Bearer-Tokens, Ablaufzeit und Method-/Pfad-Scopes. Token-Dateien speichern SHA-256-Hashes.
+- [Webinterface](docs/web.md) mit echten Botdaten, Token-Anmeldung und durch Plugins ergänzbaren Seiten, Assets und APIs.
+- Mehrere Musik-Bots mit eigenen Voice-Identitäten, Dateien, HTTP-/Radio-Streams, YouTube, Queue, Pause und Lautstärke; siehe [Musik-Bots](docs/music.md).
+- Optionales [Server-Setup-Plugin](docs/server-setup.md): Community-Aufbau mit Channels, Server-/Channelgruppen, YAML-Abgleich beim Start und geschütztem Entfernen eigener Objekte.
+
+`!help`, `!whoami`, `!whereami` benötigen kein Framework-Recht.
+`!grant`, `!group-create`, `!group-link` benötigen `cerberus.permissions.manage`.
+Mit `CERBERUS_ADMIN_UID` lässt sich eine vertrauenswürdige UID beim Start als Framework-Administrator einrichten.
+Ein TeamSpeak-Serveradmin erhält diese Rechte nicht automatisch.
+
+## Plugins
+
+Das vollständige Beispiel liegt unter [examples/welcome-plugin](examples/welcome-plugin).
+Die gebaute Datei `examples/welcome-plugin/build/libs/welcome-plugin.jar` in `plugins/` kopieren und den Bot neu starten.
+
+```kotlin
+class HelloPlugin : JavaPlugin(), Listener {
+    override fun onEnable() {
+        server.pluginManager.registerEvents(this, this)
+        getCommand("hello")!!.setExecutor { sender, _, _, args ->
+            sender.sendMessage("Hallo ${args.firstOrNull() ?: "Welt"}!")
+            true
+        }
+    }
+
+    @EventHandler
+    fun onStateChanged(event: StateChanged) {
+        logger.info("Bot-Status: ${event.current}")
+    }
+}
+```
+
+Wie bei klassischen Paper-Plugins liegt `plugin.yml` direkt im JAR:
+
+```yaml
+name: Hello
+version: '2.0.0'
+main: example.HelloPlugin
+api-version: '2.0'
+commands:
+  hello:
+    description: Begrüßung
+    usage: '<command> [name]'
+    aliases: [hi]
+```
+
+Die Plugin-Syntax orientiert sich an Paper: `JavaPlugin`, `onLoad()`, `onEnable()`, `onDisable()`,
+`Listener`, `@EventHandler`, `CommandExecutor`, `config.yml` und Scheduler.
+Die Klassen kommen aus `labs.cerberus.ts`, nicht aus Bukkit. Es handelt sich um eine eigenständige TeamSpeak-API.
+`onEnable` läuft nach der ersten Serververbindung,
+`onDisable` beim Herunterfahren bzw. nach teilweise fehlgeschlagenem Laden.
+Für Wiederverbindungen auf `StateChanged` reagieren. Commands, Listener und Tasks werden beim Stoppen automatisch entfernt.
+Eigene Ressourcen mit `own(...)` zuordnen. Die bisherige `CerberusPlugin`-/`PluginContext`-API bleibt verfügbar.
+Plugins laufen mit den Rechten des Bot-Prozesses.
+Die vollständige Anleitung mit Projektstruktur und Imports steht in [docs/plugins.md](docs/plugins.md).
+
+## REST
+
+`rest.port` aktiviert den Server, standardmäßig an `127.0.0.1`. Ein vorgeschalteter HTTPS-Proxy kann externen Zugriff übernehmen.
+`route()`-Routen einschließlich `/health` benötigen ein Bearer-Token. Explizite öffentliche Routen stellen beispielsweise die Web-Anmeldeseite und ihre Assets bereit; Verwaltungs-APIs bleiben geschützt. Ein Plugin kann ein Token erzeugen:
+
+```kotlin
+val token = getService(TokenService::class.java).generate(
+    setOf("GET /health", "GET /welcome"), Duration.ofHours(1)
+)
+```
+
+Den zurückgegebenen Wert sicher an den vorgesehenen Nutzer weitergeben.
+Scopes wie `GET /my-plugin/*` gelten für Unterpfade; GET erlaubt kein POST. `revoke(token)` widerruft ein Token.
+
+Details: [Architektur](docs/architecture.md), [Migration und offene Punkte](docs/migration.md), [Prüfungen](docs/validation.md).
+Lizenz: [MIT](LICENSE). Historische Herkunft und erhaltene Urheberangaben: [NOTICE](NOTICE).

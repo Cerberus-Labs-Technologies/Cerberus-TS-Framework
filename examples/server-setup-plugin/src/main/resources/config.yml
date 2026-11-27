@@ -1,0 +1,114 @@
+# Stabile Schlüssel (z.B. community) behalten; zum Umbenennen nur name ändern.
+# Entfernte Einträge werden ausschließlich aus dem eigenen Bestand gelöscht.
+apply-on-start: true
+prune: true
+server:
+  virtualserver_name: 'Cerberus Labs | Community'
+  virtualserver_welcomemessage: 'Willkommen bei Cerberus Labs! Viel Spaß auf unserem Community-Server.'
+channels:
+  community:
+    name: '── COMMUNITY ──'
+    properties:
+      channel_description: 'Willkommen bei Cerberus Labs. Bitte respektvoll miteinander umgehen.'
+  lounge:
+    name: 'Lounge'
+    parent: community
+    properties:
+      channel_topic: 'Ankommen, reden und entspannen'
+  talk-1:
+    name: 'Talk 1'
+    parent: community
+  talk-2:
+    name: 'Talk 2'
+    parent: community
+  gaming:
+    name: '── GAMING ──'
+  gaming-1:
+    name: 'Gaming 1'
+    parent: gaming
+  gaming-2:
+    name: 'Gaming 2'
+    parent: gaming
+  duo:
+    name: 'Duo'
+    parent: gaming
+    properties:
+      channel_maxclients: 2
+      channel_flag_maxclients_unlimited: 0
+  media:
+    name: '── MUSIK & PAUSE ──'
+  radio:
+    name: 'Radio Lounge'
+    parent: media
+    properties:
+      channel_topic: 'Gemeinsam Radio hören'
+      channel_codec: 5
+      channel_codec_quality: 8
+  afk:
+    name: 'AFK'
+    parent: media
+    properties:
+      channel_description: 'Kurz weg? Hier kannst du parken.'
+      channel_needed_talk_power: 75
+  service:
+    name: '── SUPPORT & TEAM ──'
+  support:
+    name: 'Support · Warteraum'
+    parent: service
+    properties:
+      channel_topic: 'Hier auf ein Teammitglied warten'
+  team:
+    name: 'Team · Intern'
+    parent: service
+    permissions:
+      i_channel_needed_join_power: 50
+      i_channel_needed_subscribe_power: 50
+# Nur normale Gruppen (type=1) werden erzeugt. Vorlagen bleiben unangetastet.
+# Keine automatischen Zuweisungen an Benutzer; bestehende Gruppen bleiben bestehen.
+server-groups:
+  leadership:
+    name: 'CL | Leitung'
+    template: 'Server Admin'
+    permissions:
+      i_group_sort_id: 10
+  moderation:
+    name: 'CL | Moderation'
+    template: 'Normal'
+    permissions:
+      i_group_sort_id: 20
+      i_client_talk_power: 60
+      i_channel_join_power: 60
+      i_channel_subscribe_power: 60
+      i_client_move_power: 60
+      i_client_kick_from_channel_power: 60
+      i_client_kick_from_server_power: 60
+  member:
+    name: 'CL | Mitglied'
+    template: 'Normal'
+    permissions:
+      i_group_sort_id: 30
+  music:
+    name: 'CL | Musikbot'
+    template: 'Guest'
+    permissions:
+      b_group_is_permanent: 1
+      i_group_sort_id: 40
+      i_client_talk_power: 50
+      b_client_modify_own_description: 1
+      i_client_max_avatar_filesize: 64000
+channel-groups:
+  owner:
+    name: 'CL | Channel-Leitung'
+    template: 'Channel Admin'
+    permissions:
+      i_group_sort_id: 10
+  operator:
+    name: 'CL | Channel-Moderation'
+    template: 'Operator'
+    permissions:
+      i_group_sort_id: 20
+  speaker:
+    name: 'CL | Sprecher'
+    template: 'Voice'
+    permissions:
+      i_group_sort_id: 30

@@ -1,0 +1,13 @@
+name: music
+version: '2.0.0'
+main: example.MusicPlugin
+api-version: '2.0'
+author: Cerberus Labs
+description: Mehrere Musik-Bots mit Dateien, Radio-Streams und YouTube
+commands:
+  music:
+    description: Musik-Bots verbinden und steuern
+    usage: '<command> help'
+    aliases: [musik]
+    permission: cerberus.music.control
+    permission-message: 'Dir fehlt die Berechtigung cerberus.music.control.'

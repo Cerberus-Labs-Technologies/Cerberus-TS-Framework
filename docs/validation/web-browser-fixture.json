@@ -1,0 +1,87 @@
+{
+  "mode": "fixture",
+  "date": "2026-11-27T10:09:33.771Z",
+  "results": [
+    {
+      "name": "login keyboard and field validation",
+      "passed": true
+    },
+    {
+      "name": "login uses authenticated bot status and keeps token out of URL and browser storage",
+      "passed": true
+    },
+    {
+      "name": "clients use current API data and name filtering",
+      "passed": true
+    },
+    {
+      "name": "channels select actual details",
+      "passed": true
+    },
+    {
+      "name": "core navigation and document bounds 1440",
+      "passed": true
+    },
+    {
+      "name": "core navigation and document bounds 1024",
+      "passed": true
+    },
+    {
+      "name": "core navigation and document bounds 820",
+      "passed": true
+    },
+    {
+      "name": "core navigation and document bounds 768",
+      "passed": true
+    },
+    {
+      "name": "core navigation and document bounds 390",
+      "passed": true
+    },
+    {
+      "name": "core navigation and document bounds 320",
+      "passed": true
+    },
+    {
+      "name": "status fetch failure is shown and retry restores data",
+      "passed": true
+    },
+    {
+      "name": "welcome plugin writes through its real protected API and shared refresh remounts it",
+      "passed": true
+    },
+    {
+      "name": "slow previous plugin mount cannot overwrite the next page",
+      "passed": true
+    },
+    {
+      "name": "plugin cleanup error leaves main navigation usable",
+      "passed": true
+    },
+    {
+      "name": "plugin mount failure clears partial content and offers retry",
+      "passed": true
+    },
+    {
+      "name": "plugin stylesheet failure is visible and retry loads it",
+      "passed": true
+    },
+    {
+      "name": "page disposal aborts plugin request even with its own signal",
+      "passed": true
+    },
+    {
+      "name": "read-only token cannot save plugin settings",
+      "passed": true
+    },
+    {
+      "name": "logout clears session and reload stays logged out",
+      "passed": true
+    },
+    {
+      "name": "login has no horizontal overflow at all target widths",
+      "passed": true
+    }
+  ],
+  "uncaught": []
+}

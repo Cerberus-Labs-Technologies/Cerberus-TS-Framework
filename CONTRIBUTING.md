@@ -1,53 +1,27 @@
-# Setting up a development workspace  
-1. Clone the project  
-2. Import the gradle project into your favourite IDE  
-   __Note__: Please use the gradle version configured in the wrapper task  
-3. Done  
+# Beiträge zu Cerberus TS
 
-# Coding guidelines  
-* Hold onto the basic oop principles  
-* Submit PRs cleanly and easy to read  
-  * Indicate when PRs are still WIP (submitting them in this state is okay though.)  
-  * Use topic branches  
-  * Split larger changes into multiple PRs (using a "main" topic branch)  
-* Use documentation / contracting methods  
-  * Use interfaces to provide contracts to other developers  
-  * Interfaces and public methods require documentation  
-    * Usage of ``{@inheritDoc}`` is encouraged  
-    * Getters and Setters do not require documentation outside of interfaces  
-* Remove ``@author`` tags (Contributors are tracked by GitLab)  
+Cerberus Labs entwickelt und wartet Cerberus TS. Der aktive Quellcode liegt unter
+`src/main/kotlin/labs/cerberus/ts`, Tests unter `src/test/kotlin/labs/cerberus/ts`.
+`legacy/` bewahrt den ursprünglichen Stand als historische Referenz.
 
-# Bug reports / feature requests / etc.  
-* Create a new issue in the ``jeakbot-framework`` project on [GitLab](https://gitlab.com/fearnixxgaming/jeakbot/jeakbot-framework)  
-* Bug reports:  
-  * Describe what is happening in detail  
-  * Describe what you expected to happen instead  
-  * Include information on your setup  
-    * Framework version  
-    * Installed/Enabled plugins (+ their version)  
-    * Run environment  
-      * Operating system and version  
-      * Java edition and version  
-* Feature requests
-  * Describe what you would like to have included
-  * Describe why the change/addition would help you and other developers
-  * Evaluate pros and cons before the issue submission
-* Questions
-  * For questions, please use the Discord server (issues will be closed)
+## Entwicklungsumgebung
 
-# Release workflow
+JDK 21 installieren und das Projekt als Gradle-Projekt öffnen. Den eingecheckten Wrapper verwenden:
 
-## Steps for a new release
- 1. Merge request from ``bleeding-<major>.X.X`` to ``release-<major>.X.X``
- 2. CI checks __must__ be green (including tests)
- 3. Plugin-tests __must__ be successful (manual running required - TS3 is not mocked!)
- 4. (Pre-Releases can now be tagged onto the bleeding branch)
- 5. Actual merge onto the release branch.
+```sh
+./gradlew clean build :examples:welcome-plugin:build installDist
+python3 tools/smoke_distribution.py
+```
 
-## Notes
-* CI publishes artifacts to Nexus, manual publishing is not allowed.
-* Snapshot artifacts are published to ``jeakbot-snapshots``.
-* (Pre-)Release artifacts are published to ``jeakbot-releases``.
-* (Pre-)Releases may not be re-published! (Enforced by Nexus)
-* Snapshot artifacts are automatically deleted when unused for longer periods. (Auto-clean by Nexus)
-* (Pre-)Releases may only be deleted (de-published) for security concerns.
+Kotlin-Konventionen einhalten, öffentliche API-Änderungen dokumentieren und relevante Tests ausführen.
+Das Beispiel-Plugin zeigt die Paper-artige API; Details stehen in [docs/plugins.md](docs/plugins.md).
+
+## Fehler und Änderungen
+
+Bei einem Fehler Framework-Version, Betriebssystem/JDK, TeamSpeak-Serverversion, Query-Transport,
+Reproduktionsschritte und relevante bereinigte Logs angeben. Zugangsdaten und Tokens entfernen.
+Sicherheitsprobleme nach [SECURITY.md](SECURITY.md) melden.
+
+Änderungen an der Plugin-API, Konfiguration oder Protokollbehandlung im Migrationsleitfaden erklären.
+Vor einer Veröffentlichung Tests, Distribution und Beispiel-Plugin prüfen; Live-Kompatibilität nur dann
+behaupten, wenn ein entsprechender Test tatsächlich erfolgt ist.

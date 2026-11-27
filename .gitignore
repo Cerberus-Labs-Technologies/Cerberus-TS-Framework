@@ -9,10 +9,23 @@ teamspeak3-server*/
 
 ## Gradle ##
 .gradle
+.kotlin/
+/data/
+config/*.properties
+!config/*.example.properties
+/config/ts6_known_hosts
+*.log
+__pycache__/
+*.pyc
+/web/node_modules/
+/web/dist/
+/web/*.tsbuildinfo
+/web/.taste-skill/
+/web/shots/
 build/
 
 ## Plugins (Added using submodules) ##
-plugins/
+/plugins/
 
 ## Test output ##
 logs/

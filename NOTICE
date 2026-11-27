@@ -1,0 +1,32 @@
+Cerberus TS
+Current development and maintenance: Cerberus Labs
+Copyright (c) 2026 Cerberus Labs
+
+Cerberus TS is the Kotlin redevelopment of a framework originally published as
+JeakBot / jeak-framework. Historical source files, documentation and assets are
+preserved under legacy/ and are not part of the active build.
+
+Original copyright notices are retained in LICENSE and the historical archive.
+They record the project's origin and do not designate its current developer or
+maintainer. Current development is performed by Cerberus Labs.
+
+Cerberus TS is an independent TeamSpeak integration. TeamSpeak, Minecraft,
+Bukkit and Paper names referenced in documentation identify their respective
+products or APIs and do not imply affiliation.
+
+Voice transport uses TS3J by Manevolent under Apache-2.0. PacketAead.kt adapts
+TS3J's PacketTransformation to Kotlin and uses one AEAD operation per datagram
+for compatibility with current Bouncy Castle releases. TS3J's license is in
+docs/licenses/ts3j-APACHE-2.0.txt.
+
+Opus encoding uses Concentus by Logan Stromberg and the Opus contributors.
+Its license and copyright notices are in docs/licenses/concentus-LICENSE.txt.
+FFmpeg and yt-dlp are external programs supplied by the operator; their binaries
+are not bundled in this distribution.
+
+Persistence uses Hibernate ORM 7.4.17.Final and HikariCP 7.1.0 under Apache-2.0,
+and ClassGraph 5.0.0 by Luke Hutchison under MIT. Their licenses are in
+docs/licenses/{hibernate,HikariCP,classgraph}-LICENSE.txt.
+The unmodified MariaDB Connector/J 4.0.0 is supplied as a separate runtime JAR
+under LGPL-2.1-or-later; its license is in docs/licenses/mariadb-connector-j-LICENSE.txt.
+Corresponding upstream source: https://github.com/mariadb-corporation/mariadb-connector-j/tree/4.0.0

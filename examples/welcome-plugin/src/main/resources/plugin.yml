@@ -1,0 +1,11 @@
+name: welcome
+version: '2.0.0'
+main: example.WelcomePlugin
+api-version: '2.0'
+author: Cerberus Labs
+description: Beispiel-Plugin im Paper-Stil
+commands:
+  hello:
+    description: Greet someone
+    usage: '<command> [name]'
+    aliases: [hi]
