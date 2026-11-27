@@ -40,7 +40,7 @@ docker:
       password: "PAT_MIT_READ_PACKAGES"
 ```
 
-Der Token braucht `read:packages` und Zugriff auf dieses Package, gegebenenfalls die Freigabe
+Dafür einen **Personal Access Token (classic)** mit `read:packages` und Zugriff auf dieses Package verwenden, gegebenenfalls mit Freigabe
 für das SSO der Organisation. Anschließend Wings neu starten. Der Registry-Token gehört nur
 in die Wings-Konfiguration, nicht in Egg-Variablen, TeamSpeak-Konfigurationen oder das Repository.
 Alternativ kann ein Organisationsadministrator das Package bewusst öffentlich bereitstellen.
@@ -144,4 +144,5 @@ Ein erfolgreicher Image-Smoke-Test ersetzt keinen abschließenden Test auf deine
 Quellen: [Pelican-Egg-Konfiguration](https://pelican.dev/docs/eggs/creating-a-custom-egg/),
 [aktueller Pelican-Importer](https://github.com/pelican-dev/panel/blob/main/app/Services/Eggs/Sharing/EggImporterService.php),
 [private Wings-Registries](https://pelican.dev/docs/wings/optional-config/),
+[GHCR-Authentifizierung](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry),
 [yt-dlp-Abhängigkeiten](https://github.com/yt-dlp/yt-dlp#dependencies).

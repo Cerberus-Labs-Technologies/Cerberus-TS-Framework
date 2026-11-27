@@ -25,7 +25,7 @@ Zusätzlich acht Python-Prüfungen für Egg-Exporte, Allocation, Plugin-Auswahl,
 python3 tools/test_pelican.py --distribution build/install/cerberus-ts-web-preview
 ```
 
-Die separate Image-Pipeline prüft zusätzlich den tatsächlichen Linux-Container vor der Veröffentlichung; der Test auf dem Ziel-Pelican-Node steht noch aus. Anleitung: [Pelican](pelican.md).
+Die [Image-Pipeline vom 27. November 2026](https://github.com/Cerberus-Labs-Technologies/Cerberus-TS-Framework/actions/runs/45997654611) für Commit `5ed9fd2ace6398ff2962b1958685e1e9a74a3379` hat beide Jobs erfolgreich abgeschlossen: tatsächlicher amd64-Container mit Web-/Token-/Stop-Smoke-Test als Benutzer ohne Root-Rechte sowie Veröffentlichung für amd64/arm64. Das Image liegt unter `ghcr.io/cerberus-labs-technologies/cerberus-ts-framework:latest` und `:sha-5ed9fd2ace6398ff2962b1958685e1e9a74a3379`. Der direkte Registry-Abruf mit der vorhandenen lokalen Git-Anmeldung lieferte HTTP 403; ein Pull mit einem passenden Package-Lesetoken und der Test auf dem Ziel-Pelican-Node stehen noch aus. Anleitung: [Pelican](pelican.md).
 
 ## Automatisiert geprüft
 
@@ -106,7 +106,7 @@ Während des längeren Hörtests meldete TS3J vereinzelt `IllegalArgumentExcepti
 Beim Neustart meldete der Server den bisherigen Query-Nickname noch als belegt. Der laufende Test-Controller verwendet deshalb `Cerberus Radio Control`; automatisches Wiederherstellen bei einem belegten Namen wurde nicht implementiert.
 SMTP wurde mit einem lokalen Testserver einschließlich tatsächlicher STARTTLS-/impliziter TLS-Handshakes, Authentifizierung und Zertifikats-/Servernamen-Ablehnungen geprüft; eine Prüfung gegen einen externen Mailanbieter steht weiter aus. Hibernate/Pools wurden gegen H2 geprüft; eine externe MariaDB-Instanz ist noch nicht geprüft.
 Das Webinterface wurde gebaut und seine HTTP-/Plugin-Integration automatisiert geprüft. Die Browser-Funktionsprüfung bestand 13 Szenarien mit echten TS6-Daten sowie 20 Szenarien mit einer lokalen Query-Fixture und der tatsächlichen Welcome-Plugin-JAR, jeweils einschließlich Navigation bei 1440/1024/820/768/390/320 Pixeln. Visuelle Taste-Prüfungen sind separat in `web/DESIGN.md` dokumentiert; es wird kein vollständiger visueller Abschluss behauptet.
-Der GitHub-Actions-/CodeQL-Workflow wurde aktualisiert, aber nicht auf GitHub ausgeführt.
+Der Pelican-Image-Workflow wurde erfolgreich auf GitHub ausgeführt (siehe oben). Für den separaten CodeQL-Workflow ist weiterhin keine erfolgreiche Analyse nachgewiesen.
 
 Unter der lokalen macOS-Version blockierte Gradles nativer Dateiwächter. `org.gradle.vfs.watch=false` verhindert dies;
 der Build benötigt keinen Dateiwächter. Alle 358 ursprünglichen Dateien unter `src` sind bytegleich unter `legacy/src` erhalten.
