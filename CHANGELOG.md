@@ -2,6 +2,8 @@
 
 ## 2.0.0-SNAPSHOT
 
+- Pelican-Eggs für PLCN_v3/PTDL_v2, Container-Image mit Musik-Werkzeugen und GitHub-Packages-Workflow; persistente Serverdaten und konsolenunabhängiges Bereitschaftssignal.
+
 - Cerberus Labs übernimmt die Entwicklung und Wartung der Kotlin-Neufassung unter dem Namen Cerberus TS.
 - Packages und Maven-Gruppe auf `labs.cerberus`, Artefakte und Startprogramm auf `cerberus-ts` umgestellt.
 - Konfiguration auf `cerberus.properties`, Umgebungsvariablen auf `CERBERUS_` und Framework-Rechte auf `cerberus.*` umgestellt.

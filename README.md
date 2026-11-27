@@ -20,6 +20,8 @@ export CERBERUS_PASSWORD='...'
 ```
 
 `./gradlew installDist` erstellt `build/install/cerberus-ts` mit Startskripten und Laufzeitabhängigkeiten.
+Für den Betrieb im **Pelican-Panel** stehen ein importierbares Egg und ein Container-Image mit Musik-Werkzeugen bereit: [Pelican-Anleitung](docs/pelican.md).
+
 ZIP/TAR: `./gradlew distZip distTar`. `--config <datei>` wählt eine andere Konfiguration.
 In der optionalen lokalen Konsole beendet `stop` den Bot; diese Konsole besitzt Administratorrechte.
 

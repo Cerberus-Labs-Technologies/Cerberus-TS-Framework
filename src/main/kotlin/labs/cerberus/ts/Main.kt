@@ -16,6 +16,9 @@ fun main(args: Array<String>) {
     }
     if ("--check-config" in args) { println("Configuration valid: ${config.connection}"); return }
     val bot = CerberusBot(config)
+    val lifecycle = bot.events.subscribe<labs.cerberus.ts.event.StateChanged> {
+        println("[cerberus] ${it.current}")
+    }
     val shutdown = Thread(bot::close, "cerberus-shutdown")
     Runtime.getRuntime().addShutdownHook(shutdown)
     try {
@@ -30,6 +33,9 @@ fun main(args: Array<String>) {
         System.err.println("Cerberus TS failed: ${e.javaClass.simpleName}")
         bot.close()
         exitProcess(1)
-    } finally { runCatching { Runtime.getRuntime().removeShutdownHook(shutdown) } }
+    } finally {
+        lifecycle.close()
+        runCatching { Runtime.getRuntime().removeShutdownHook(shutdown) }
+    }
     if (bot.failed) exitProcess(1)
 }

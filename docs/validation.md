@@ -17,6 +17,16 @@ Der erste Befehl kompiliert Anwendung und Beispiel-Plugin, führt die Tests aus 
 Der Referenzcheck verifiziert die SHA-256-Prüfsumme des offiziellen TS6-beta14-Archivs und gleicht 40 Parametersätze sowie WebQuery-Merkmale gegen die enthaltenen Handbücher ab.
 Der Smoke-Test verwendet ausschließlich einen lokalen TCP-Testpartner und temporäre Dateien.
 
+## Pelican-Betrieb
+
+Zusätzlich acht Python-Prüfungen für Egg-Exporte, Allocation, Plugin-Auswahl, Updates ohne Datenverlust, Host-Key-Pflicht und sichere Parameter-/Passwortübergabe bestanden. Der Pelican-Startablauf wurde mit der echten Distribution gegen einen lokalen Query-Testserver ausgeführt: Bereitschaft ohne Welcome-Plugin, Web-Port aus der Allocation, geschützte API, Anmeldung mit Konsolentoken und sauberes `stop` bestanden.
+
+```sh
+python3 tools/test_pelican.py --distribution build/install/cerberus-ts-web-preview
+```
+
+Die separate Image-Pipeline prüft zusätzlich den tatsächlichen Linux-Container vor der Veröffentlichung; der Test auf dem Ziel-Pelican-Node steht noch aus. Anleitung: [Pelican](pelican.md).
+
 ## Automatisiert geprüft
 
 - Vollständiges Escaping einschließlich Bell/vertikalem Tab, Unicode, leeren Werten und `=` in Werten; 1.000 deterministische zufällige Rundläufe.
