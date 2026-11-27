@@ -77,7 +77,7 @@ dependencies {
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:4.0.0")
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.1")
-    testImplementation("org.apache.sshd:sshd-core:2.16.0")
+    testImplementation("org.apache.sshd:sshd-core:2.20.1")
     testImplementation("com.h2database:h2:2.4.240")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.14.1")
 }
