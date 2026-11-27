@@ -2,6 +2,7 @@ import labs.cerberus.ts.*;
 import labs.cerberus.ts.query.*;
 import labs.cerberus.ts.service.*;
 import labs.cerberus.ts.web.*;
+import labs.cerberus.ts.voice.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.*;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -19,7 +20,7 @@ public class WebPreview {
       var rows = switch(command.getName()) {
         case "version" -> List.of(Map.of("version", "6.0.0-beta14"));
         case "whoami" -> List.of(Map.of("client_id", "99", "virtualserver_id", "1"));
-        case "serverinfo" -> List.of(Map.of("virtualserver_name", "Lokaler UI-Integrationstest", "virtualserver_maxclients", "16", "virtualserver_clientsonline", "3", "virtualserver_queryclientsonline", "1"));
+        case "serverinfo" -> List.of(Map.of("virtualserver_port", "24871", "virtualserver_name", "Lokaler UI-Integrationstest", "virtualserver_maxclients", "16", "virtualserver_clientsonline", "3", "virtualserver_queryclientsonline", "1"));
         case "clientlist" -> List.of(
           Map.of("clid", "11", "cid", "1", "client_database_id", "7", "client_unique_identifier", "fixture-alice", "client_nickname", "UI-Testnutzer", "client_servergroups", "6"),
           Map.of("clid", "12", "cid", "2", "client_database_id", "8", "client_unique_identifier", "fixture-bot", "client_nickname", "Musik-Testclient", "client_servergroups", "6"),
@@ -62,7 +63,10 @@ public class WebPreview {
     if (!Set.of("fixture", "live").contains(mode)) throw new IllegalArgumentException("Use fixture or live");
     var base = Files.createTempDirectory("cerberus-web-" + mode + "-");
     var plugins = Files.createDirectory(base.resolve("plugins"));
-    if (mode.equals("fixture")) Files.copy(Path.of("examples/welcome-plugin/build/libs/welcome-plugin.jar"), plugins.resolve("welcome.jar"));
+    if (mode.equals("fixture")) {
+      Files.copy(Path.of("examples/welcome-plugin/build/libs/welcome-plugin.jar"), plugins.resolve("welcome.jar"));
+      Files.copy(Path.of("examples/music-plugin/build/libs/music-plugin.jar"), plugins.resolve("music.jar"));
+    }
     var environment = new HashMap<>(System.getenv());
     environment.put("CERBERUS_DATA_DIRECTORY", base.resolve("data").toString());
     environment.put("CERBERUS_PLUGIN_DIRECTORY", plugins.toString());
@@ -71,7 +75,27 @@ public class WebPreview {
     if (mode.equals("fixture")) environment.put("CERBERUS_PASSWORD", "local-fixture-only");
     var config = BotConfig.Companion.load(mode.equals("live") ? Path.of("config/music-live.properties") : base.resolve("unused.properties"), environment);
     var fixture = new Fixture();
-    try (var bot = new CerberusBot(config, connection -> mode.equals("live") ? readOnly(connection) : fixture)) {
+    try (var bot = new CerberusBot(config, mode.equals("fixture") ? new VoiceProvider() {
+      private int next = 100;
+      public String getId() { return "ui-fixture"; }
+      public VoiceConnection connect(String host, int port, String identity, String nickname, String password) {
+        int id = next++;
+        return new VoiceConnection() {
+          private volatile boolean open = true, paused;
+          public boolean isConnected() { return open; }
+          public int getClientId() { return id; }
+          public boolean getPaused() { return paused; }
+          public void setPaused(boolean value) { paused = value; }
+          public int getBufferedPackets() { return 0; }
+          public void move(int channel, String password) {}
+          public void sendOpus(byte[] packet) { try { while (paused && open) Thread.sleep(20); Thread.sleep(20); } catch (InterruptedException e) { Thread.currentThread().interrupt(); } }
+          public void clearAudio() {}
+          public AutoCloseable onOpus(kotlin.jvm.functions.Function2<? super Integer,? super byte[],kotlin.Unit> callback) { return () -> {}; }
+          public void privateMessage(int client, String message) {}
+          public void close() { open = false; }
+        };
+      }
+    } : new Ts3jVoiceProvider(), connection -> mode.equals("live") ? readOnly(connection) : fixture)) {
       var verbs = Set.of("GET", "PUT", "POST", "PATCH", "DELETE");
       var scopes = new HashSet<String>();
       for (var verb : verbs) { scopes.add(verb+" /api/web/*"); scopes.add(verb+" /api/plugins/*"); }

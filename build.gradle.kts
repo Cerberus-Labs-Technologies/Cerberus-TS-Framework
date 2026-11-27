@@ -85,6 +85,7 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     dependsOn(":examples:welcome-plugin:jar", ":examples:music-plugin:jar")
+    inputs.files(project(":examples:welcome-plugin").tasks.named("jar"), project(":examples:music-plugin").tasks.named("jar"))
     systemProperty("cerberus.example.jar", layout.projectDirectory.file("examples/welcome-plugin/build/libs/welcome-plugin.jar").asFile.absolutePath)
     systemProperty("cerberus.music.jar", layout.projectDirectory.file("examples/music-plugin/build/libs/music-plugin.jar").asFile.absolutePath)
 }

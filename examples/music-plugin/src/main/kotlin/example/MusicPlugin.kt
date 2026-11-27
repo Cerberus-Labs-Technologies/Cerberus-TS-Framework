@@ -3,12 +3,16 @@ package example
 import labs.cerberus.ts.plugin.JavaPlugin
 import labs.cerberus.ts.music.MusicService
 import labs.cerberus.ts.music.MusicStatus
-import java.util.concurrent.Executors
+import java.util.concurrent.*
+import labs.cerberus.ts.rest.RestException
+import labs.cerberus.ts.web.WebPage
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** Paper-style optional plugin. Network and media work stays off the Query event dispatcher. */
 class MusicPlugin : JavaPlugin() {
     private val busy = AtomicBoolean()
+    private val stopping = AtomicBoolean()
+    private val ownership = Any()
     private val ownedBots = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
     private val worker = Executors.newSingleThreadExecutor(Thread.ofPlatform().daemon().name("cerberus-music-commands").factory())
     override fun onEnable() {
@@ -29,12 +33,7 @@ class MusicPlugin : JavaPlugin() {
                             "help" -> sender.sendMessage("!music create <id> <channel-id> [name] | play/add <id> <Datei/URL> | pause/resume/skip/stop/status/queue/remove <id> | volume <id> <0-100> | move <id> <channel-id> | list")
                             "create" -> {
                                 val id = argument(1)
-                                val voice = server.teamSpeak
-                                val info = voice.serverInfo()
-                                val name = args.drop(3).joinToString(" ").ifBlank { "Cerberus Music $id".take(30) }
-                                val status = music.create(id, voice.config.host, info.getValue("virtualserver_port").toInt(), integer(2), name,
-                                    System.getenv("CERBERUS_VOICE_PASSWORD"))
-                                ownedBots += id
+                                val status = createBot(id, integer(2), args.drop(3).joinToString(" "))
                                 sender.sendMessage("Musik-Bot $id verbunden (Client ${status.clientId}).")
                             }
                             "list" -> sender.sendMessage(music.list().joinToString("\n", transform = ::describe).ifBlank { "Keine Musik-Bots verbunden." })
@@ -47,7 +46,7 @@ class MusicPlugin : JavaPlugin() {
                             "volume" -> { music.bot(argument(1)).volume(integer(2)); sender.sendMessage("Lautstärke: ${integer(2)} %.") }
                             "move" -> { music.bot(argument(1)).move(integer(2)); sender.sendMessage("Musik-Bot verschoben.") }
                             "status", "queue" -> sender.sendMessage(describe(music.bot(argument(1)).status()))
-                            "remove" -> { music.remove(argument(1)); ownedBots -= argument(1); sender.sendMessage("Musik-Bot getrennt.") }
+                            "remove" -> { removeBot(argument(1)); sender.sendMessage("Musik-Bot getrennt.") }
                             else -> sender.sendMessage("Unbekannter Musik-Befehl. Siehe !music help")
                         }
                     } catch (e: Exception) {
@@ -57,6 +56,11 @@ class MusicPlugin : JavaPlugin() {
                 }
             } catch (e: Exception) { busy.set(false); throw e }
             true
+        }
+        if (server.web.isAvailable) {
+            server.web.registerController(MusicWebController(this, music))
+            server.web.registerPage(WebPage("control", "Musik-Bots", "Musik abspielen, Bots verbinden und Warteschlangen verwalten.", "index.js", "style.css", 50),
+                mapOf("index.js" to "web/index.js", "style.css" to "web/style.css"))
         }
         logger.info("Musik-Befehle bereit: !music help")
     }
@@ -68,10 +72,51 @@ class MusicPlugin : JavaPlugin() {
         status.error?.let { append("; Fehler: $it") }
         status.presentationError?.let { append("; Beschreibung/Avatar: $it") }
     }
+    internal fun createBot(id: String, channelId: Int, nickname: String, channelPassword: String? = null): MusicStatus {
+        val name = nickname.ifBlank { "Cerberus Music $id".take(30) }
+        require(name.length in 3..30 && name.none { it.isISOControl() }) { "Name: 3 bis 30 Zeichen ohne Steuerzeichen" }
+        val voice = server.teamSpeak
+        if (!voice.isConnected) throw RestException(503, "Die Query-Verbindung zum TeamSpeak-Server fehlt.")
+        val status = getService(MusicService::class.java).create(id, voice.config.host,
+            voice.serverInfo().getValue("virtualserver_port").toInt(), channelId, name,
+            System.getenv("CERBERUS_VOICE_PASSWORD"), channelPassword)
+        synchronized(ownership) {
+            if (stopping.get()) {
+                getService(MusicService::class.java).remove(id)
+                throw RestException(503, "Das Musik-Plugin wird beendet.")
+            }
+            ownedBots += id
+        }
+        return status
+    }
+    internal fun removeBot(id: String) {
+        getService(MusicService::class.java).remove(id)
+        ownedBots -= id
+    }
+    /** Web writes share the command worker, so competing operations are rejected rather than queued. */
+    internal fun <T> webWrite(action: () -> T): T {
+        if (stopping.get()) throw RestException(503, "Das Musik-Plugin wird beendet.")
+        if (!busy.compareAndSet(false, true)) throw RestException(409, "Ein Musik-Befehl läuft noch. Bitte kurz warten.")
+        val future = try { worker.submit(Callable { try { action() } finally { busy.set(false) } }) }
+        catch (_: RejectedExecutionException) { busy.set(false); throw RestException(503, "Das Musik-Plugin wird beendet.") }
+        try { return future.get() }
+        catch (_: InterruptedException) { Thread.currentThread().interrupt(); throw RestException(503, "Anfrage unterbrochen. Status vor erneutem Senden prüfen.") }
+        catch (_: CancellationException) { throw RestException(503, "Das Musik-Plugin wird beendet.") }
+        catch (e: ExecutionException) {
+            when (val cause = e.cause) {
+                is RestException -> throw cause
+                is IllegalArgumentException -> throw RestException(400, cause.message ?: "Ungültige Musik-Eingabe.")
+                is IllegalStateException -> throw RestException(409, cause.message ?: "Musik-Aktion derzeit nicht möglich.")
+                else -> { logger.warning("Musik-Webaktion fehlgeschlagen: ${cause?.javaClass?.simpleName}"); throw RestException(502, "Die Musik-Aktion ist fehlgeschlagen. Verbindung und Serverrechte prüfen.") }
+            }
+        }
+    }
     override fun onDisable() {
-        worker.shutdownNow()
-        worker.awaitTermination(15, java.util.concurrent.TimeUnit.SECONDS)
-        ownedBots.forEach { id -> runCatching { getService(MusicService::class.java).remove(id) } }
-        ownedBots.clear()
+        stopping.set(true)
+        worker.shutdownNow().forEach { (it as? Future<*>)?.cancel(false) }
+        try { worker.awaitTermination(15, TimeUnit.SECONDS) }
+        catch (_: InterruptedException) { Thread.currentThread().interrupt() }
+        val ids = synchronized(ownership) { ownedBots.toList().also { ownedBots.clear() } }
+        ids.forEach { id -> runCatching { getService(MusicService::class.java).remove(id) } }
     }
 }

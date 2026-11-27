@@ -1,0 +1,71 @@
+{
+  "mode": "fixture",
+  "date": "2026-11-27T14:27:32.437Z",
+  "results": [
+    {
+      "name": "plugin page loads actual assets and empty state",
+      "passed": true
+    },
+    {
+      "name": "connect a bot through the form and select it",
+      "passed": true
+    },
+    {
+      "name": "play real local WAV and queue a second source",
+      "passed": true
+    },
+    {
+      "name": "polling preserves unfinished input and keyboard focus",
+      "passed": true
+    },
+    {
+      "name": "volume and channel controls submit actual plugin actions",
+      "passed": true
+    },
+    {
+      "name": "resume skip and stop update queue and playback",
+      "passed": true
+    },
+    {
+      "name": "asynchronous media failure is visible",
+      "passed": true
+    },
+    {
+      "name": "music page bounds and actions at 1440px",
+      "passed": true
+    },
+    {
+      "name": "music page bounds and actions at 1024px",
+      "passed": true
+    },
+    {
+      "name": "music page bounds and actions at 820px",
+      "passed": true
+    },
+    {
+      "name": "music page bounds and actions at 768px",
+      "passed": true
+    },
+    {
+      "name": "music page bounds and actions at 390px",
+      "passed": true
+    },
+    {
+      "name": "music page bounds and actions at 320px",
+      "passed": true
+    },
+    {
+      "name": "read token cannot change playback through the browser",
+      "passed": true
+    },
+    {
+      "name": "disconnect selected bot removes its actual voice connection",
+      "passed": true
+    },
+    {
+      "name": "navigation stops plugin polling",
+      "passed": true
+    }
+  ],
+  "uncaught": []
+}

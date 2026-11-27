@@ -10,6 +10,8 @@ Den Bot mit `--console` starten und in seiner lokalen Konsole `web-token` eingeb
 
 Die HTML-Seite und ausdrücklich registrierte Assets sind öffentlich. API-Aufrufe benötigen passende Bearer-Scopes. Ein reines Lesetoken kann mit `TokenService.generate(setOf("GET /api/web/*", "GET /api/plugins/*"), duration)` erstellt werden. Externer Zugriff kann über einen HTTPS-Reverse-Proxy erfolgen; der Listener bleibt standardmäßig lokal. Konfigurationspasswörter werden von der Verwaltungs-API nicht ausgeliefert.
 
+Das gebündelte Musik-Plugin ergänzt die Seite **Musik-Bots** mit Bot-Verbindungen, Wiedergabe, Queue, Lautstärke und Channelwechsel. Die Bedienung und API stehen in [Musik-Bots](music.md#steuerung-im-webinterface).
+
 ## Seite aus einem Paper-artigen Plugin registrieren
 
 Das vollständige Beispiel ist das [Welcome-Plugin](../examples/welcome-plugin). Es liefert eine Einstellungsseite samt tatsächlich speichernder API aus.
@@ -55,14 +57,14 @@ Ein Plugin muss Ressourcen, die es bereits vor einem fehlgeschlagenen `mount` an
 
 ## Reproduzierbare Bedienprüfung
 
-`tools/WebPreview.java` startet die gebaute Distribution mit echten HTTP-APIs und entweder einem lokalen Query-Fixture (`fixture`) oder einer ausschließlich lesenden TS6-Verbindung ohne Plugins (`live`). Die tatsächliche Welcome-JAR wird nur im Fixture-Modus geladen. Der Harness schreibt seine kurzlebigen Testtokens in eine private temporäre Datei und gibt ausschließlich deren Pfad aus.
+`tools/WebPreview.java` startet die gebaute Distribution mit echten HTTP-APIs und entweder einem lokalen Query-Fixture (`fixture`) oder einer ausschließlich lesenden TS6-Verbindung ohne Plugins (`live`). Die tatsächlichen Welcome- und Musik-JARs werden nur im Fixture-Modus geladen. Die Voice-Verbindungen des Musikdienstes werden dort durch lokale Testverbindungen ersetzt; FFmpeg und die HTTP-APIs bleiben echt. Der Harness schreibt seine kurzlebigen Testtokens in eine private temporäre Datei und gibt ausschließlich deren Pfad aus.
 
 `web/scripts/browser-check.mjs <metadata.json> <report.json>` prüft die Anmeldung, Suche, Navigation, Fehlerwiederholung und Abmeldung bei 1440, 1024, 820, 768, 390 und 320 Pixeln. Im Fixture-Modus prüft es zusätzlich Speichern, eingeschränkte Tokens, asynchrones Einbinden, Stylesheet-Fehler, Cleanup-Fehler und Request-Abbruch. Es benötigt `npm ci` sowie einen Playwright-Browser oder `CERBERUS_BROWSER` mit einem Chromium-Pfad. Berichte enthalten keine Tokens.
 
 Vom Repository-Verzeichnis aus lässt sich der lokale Harness so starten:
 
 ```sh
-./gradlew :examples:welcome-plugin:jar installDist -Pcerberus.install.dir=build/install/cerberus-ts-web-preview
+./gradlew :examples:welcome-plugin:jar :examples:music-plugin:jar installDist -Pcerberus.install.dir=build/install/cerberus-ts-web-preview
 javac -cp 'build/install/cerberus-ts-web-preview/lib/*' -d /private/tmp tools/WebPreview.java
 java -cp '/private/tmp:build/install/cerberus-ts-web-preview/lib/*' WebPreview fixture
 ```
@@ -72,3 +74,5 @@ Die Harness-Konsole mit `stop` beenden. Der ausgegebene Metadatenpfad ist das er
 Für angemeldete Taste-Aufnahmen hängt sich `web/scripts/shoot-auth.mjs` ausschließlich an den vom unveränderten Taste-Skript gestarteten Browser und bedient das normale Loginformular. Ein frisches Profil pro Aufnahme verhindert Verwechslungen mit wiederhergestellten Tabs. Erst nach gespeicherter PNG und bestätigtem Schließen dieses Browsers beendet der Helfer gegebenenfalls dessen zurückgebliebenen Nodeprozess. Er verändert weder Anwendung noch Prüftool und startet keinen zweiten Browser. Metadaten, Browserprofile und Aufnahmen bleiben lokale QA-Artefakte.
 
 Diese Funktionstests ersetzen weder visuelle Prüfung noch die Prüfung jeder künftigen Plugin-Seite. Taste-Auswahl und Darstellungsnachweise stehen in [web/DESIGN.md](../web/DESIGN.md).
+
+`web/scripts/music-check.mjs <metadata.json> <report.json>` prüft zusätzlich die Musiksteuerung mit tatsächlicher lokaler WAV-Dekodierung, Bot-Lebenszyklus, Lesetoken, Polling und sechs Bildschirmbreiten. Dieser mutierende Test akzeptiert ausschließlich den Fixture-Modus. FFmpeg muss im PATH der Vorschau liegen.

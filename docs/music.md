@@ -1,7 +1,7 @@
 # Musik-Bots
 
 Cerberus TS stellt mit `MusicService` mehrere unabhängige Voice-Clients bereit.
-Das optionale Paper-artige Plugin `examples/music-plugin` steuert diese über `!music` oder `!musik`.
+Das optionale Paper-artige Plugin `examples/music-plugin` steuert diese über `!music`, `!musik` oder seine Seite im Webinterface.
 Die Kotlin-Implementierung verwendet TS3J für UDP/Handshake, FFmpeg für das Decoding
 und Concentus für 48-kHz-Stereo-Opus in 20-ms-Paketen. Es wird keine Soundkarte benötigt.
 
@@ -38,7 +38,43 @@ Die UID lässt sich mit `!whoami` beim Query-Bot abfragen. Alle Musikbefehle ben
 Private Chatbefehle an den **Query-Bot** senden. Dieser steuert die getrennten Voice-Clients.
 Private Nachrichten direkt an einen Voice-Musik-Bot werden bislang nicht als Befehle verarbeitet.
 
-## Bedienung
+## Steuerung im Webinterface
+
+Das `music`-Plugin registriert bei aktiviertem Webinterface die Seite **Musik-Bots** in der Navigation.
+In der Framework- beziehungsweise Pelican-Konsole `web-token` eingeben und mit dem Token anmelden.
+Das gebündelte Pelican-Image enthält Plugin und Oberfläche; `CERBERUS_BUNDLED_PLUGINS` muss `music` enthalten.
+
+1. Unter **Bot verbinden** eine Bot-ID, optional einen Anzeigenamen und den Start-Channel wählen.
+   Für geschützte Channels lässt sich ein Channel-Passwort angeben.
+2. Den gewünschten Bot auswählen. Einen YouTube-Link, einen direkten Radio-/Audio-Link oder den Namen
+   einer Datei unter `data/music/files/` als **Musikquelle** eingeben.
+3. **Jetzt abspielen** ersetzt Wiedergabe und Queue; **Zur Queue hinzufügen** stellt die Quelle hinten an.
+4. Pause/Fortsetzen, nächster Titel, Stoppen mit Leeren der Queue, Lautstärke, Channelwechsel und
+   Trennen des ausgewählten Bots lassen sich auf derselben Seite bedienen.
+
+Titel, Künstler, Radiosender, Wiedergabe- und Anzeigefehler sowie die Warteschlange werden alle vier Sekunden
+aktualisiert. Ungesendete Formulareingaben bleiben dabei erhalten. Eine angenommene Wiedergabeaktion bedeutet,
+dass die Quelle im Hintergrund geladen wird; Fehler bei FFmpeg oder YouTube erscheinen anschließend beim Bot.
+
+Webzugriff verwendet die Bearer-Scopes des Tokens, unabhängig von TeamSpeak-UID und `cerberus.music.control`.
+Das lokale `web-token` erlaubt die Steuerung. Ein Token mit ausschließlich GET-Scopes darf Status und Channels
+lesen, erhält bei Änderungen aber HTTP 401. Gleichzeitige Web-/Chat-Schreibaktionen erhalten HTTP 409;
+es gibt keine unbegrenzte Befehlswarteschlange. Beim Entladen des Plugins verschwinden Seite und API,
+und die von diesem Plugin erstellten Bots werden getrennt.
+
+Die Plugin-API liegt unter `/api/plugins/music`:
+
+| Methode | Pfad | Inhalt |
+| --- | --- | --- |
+| GET | `/bots` | Status aller Musik-Bots dieser Instanz |
+| GET | `/channels` | Aktuelle Channel-Auswahl des TeamSpeak-Servers |
+| POST | `/bots` | `{ "id": "radio", "channelId": 1, "nickname": "Cerberus Music" }`, optional `channelPassword` |
+| POST | `/bots/{id}/actions` | `action`: `play`, `enqueue`, `pause`, `resume`, `skip`, `stop`, `volume` oder `move`; dazu `source`, `volume` oder `channelId` und optional `channelPassword` |
+| DELETE | `/bots/{id}` | Voice-Client trennen und Queue entfernen |
+
+Ein Neustart stellt Bots und Queues weiterhin nicht automatisch wieder her; Identitäten bleiben erhalten.
+
+## Bedienung im TeamSpeak-Chat
 
 ```text
 !music create lounge 1 Cerberus Music

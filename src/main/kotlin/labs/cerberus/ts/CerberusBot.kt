@@ -15,7 +15,11 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class CerberusBot(val config: BotConfig, connector: (ConnectionConfig) -> QueryConnection = QueryConnections::open) : AutoCloseable {
+class CerberusBot @JvmOverloads constructor(val config: BotConfig,
+    voiceProvider: labs.cerberus.ts.voice.VoiceProvider = Ts3jVoiceProvider(),
+    connector: (ConnectionConfig) -> QueryConnection = QueryConnections::open) : AutoCloseable {
+    constructor(config: BotConfig, connector: (ConnectionConfig) -> QueryConnection) : this(config, Ts3jVoiceProvider(), connector)
+
     val services = Services()
     val database = DatabaseService()
     val events = EventBus(database)
@@ -25,7 +29,7 @@ class CerberusBot(val config: BotConfig, connector: (ConnectionConfig) -> QueryC
     val localization = LocalizationService(directory = config.dataDirectory.resolve("localization"))
     val tokens = TokenService(config.dataDirectory.resolve("tokens.json"))
     val commands = CommandService(server, permissions, config.commandPrefix, localization)
-    val music = MusicService(config.dataDirectory.resolve("music"), config.music)
+    val music = MusicService(config.dataDirectory.resolve("music"), config.music, voiceProvider)
     val mailTransports = MailTransports()
     val notifications = NotificationService(server, profiles, mailTransports)
     private val tasks = TaskService()

@@ -23,11 +23,9 @@ arm64-Betriebstest ist damit nicht behauptet. `latest` wird erst nach erfolgreic
 Zusätzlich erhält jeder Stand den Tag `sha-<vollständiger Commit-SHA>`.
 Ein grüner Workflow **Pelican runtime image** und ein abrufbares Package sind vor dem ersten Start erforderlich.
 
-## Privates GitHub-Repository
+## Repository und Image-Zugriff
 
-Das Framework-Repository ist derzeit privat. Die Egg-Datei angemeldet auf GitHub herunterladen
-oder aus dem lokalen Checkout verwenden und als Datei importieren. Eine anonyme Raw-URL funktioniert
-für dieses Repository nicht; automatische Egg-Updates sind deshalb in den Exporten deaktiviert.
+Das Framework-Repository ist öffentlich. Das [native Egg](https://github.com/Cerberus-Labs-Technologies/Cerberus-TS-Framework/raw/refs/heads/main/deploy/pelican/egg-cerberus-ts.json) herunterladen und als Datei importieren. Automatische Egg-Updates bleiben in den Exporten deaktiviert. Die Sichtbarkeit des GHCR-Packages wird separat vom Repository verwaltet.
 
 Neue GHCR-Packages sind normalerweise privat. Für private Images auf dem Wings-Node
 in `/etc/pelican/config.yml` die Registry ergänzen; vorhandene Docker-Einstellungen beibehalten:
@@ -86,6 +84,7 @@ Der Workflow verändert keine Package-Sichtbarkeit.
    Webinterface unter Umständen bereits erreichbar, der Bot aber noch nicht bereit.
 7. In der Panel-Konsole **`web-token`** eingeben. Das ausgegebene Token ist 24 Stunden gültig.
    Das Webinterface unter `http://NODE-IP:ALLOCATION` öffnen und mit dem Token anmelden.
+   Unter **Musik-Bots** lassen sich bei geladenem `music`-Plugin Voice-Bots und Wiedergabe steuern, siehe [Musiksteuerung](music.md#steuerung-im-webinterface).
    Für dauerhaften Zugriff über das Internet HTTPS über einen Reverse Proxy einrichten.
 
 Die Panel-Anmeldung meldet dich nicht automatisch im Framework-Webinterface an.
