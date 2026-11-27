@@ -12,7 +12,7 @@ dependencies {
     testImplementation(project(":"))
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.14.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.1.3")
 }
 tasks.test {
     useJUnitPlatform()
