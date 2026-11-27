@@ -33,10 +33,11 @@ COPY --from=build /source/examples/server-setup-plugin/build/libs/server-setup-p
 COPY deploy/pelican/start.sh /opt/cerberus/start.sh
 ENV PATH="/opt/yt-dlp/bin:${PATH}" USER=container \
     CERBERUS_MUSIC_FFMPEG=/usr/bin/ffmpeg CERBERUS_MUSIC_YTDLP=/opt/yt-dlp/bin/yt-dlp \
-    CERBERUS_MUSIC_JS_RUNTIME=/usr/local/bin/node
+    CERBERUS_MUSIC_JS_RUNTIME=node
 RUN chmod 0755 /opt/cerberus/start.sh \
     && java -version && node --version && ffmpeg -version && yt-dlp --version \
     && /opt/yt-dlp/bin/python -c "import yt_dlp, yt_dlp_ejs" \
+    && yt-dlp --ignore-config --js-runtimes "$CERBERUS_MUSIC_JS_RUNTIME" --list-extractors >/dev/null \
     && /opt/cerberus/app/bin/cerberus-ts --help
 USER container
 WORKDIR /home/container
