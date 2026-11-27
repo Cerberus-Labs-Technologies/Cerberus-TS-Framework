@@ -52,3 +52,20 @@ Das TS6-Streaming-Protokoll ist undokumentiert. Die MIT-Bibliothek [teamspeak-js
 TS6-Updates können die Kompatibilität ändern. Das Vorhandensein von `STREAM_P2P` wird vor der Freigabe geprüft; TS3 wird abgewiesen. Das Angebot enthält Opus-Audio vor VP8-Video und bleibt unter der TS6-Befehlsgrößengrenze. Nur eigene Streams werden beendet. Die Software-Tests ersetzen noch keinen Sicht-/Hörtest im offiziellen Desktop-Client und keinen Test der tatsächlichen Pelican-NAT-Konfiguration.
 
 Reproduzierbare Prüfung: `CERBERUS_TEST_FFMPEG=/pfad/ffmpeg CERBERUS_TEST_FFPROBE=/pfad/ffprobe npm --prefix video test`. Der explizite Live-Test `node video/live-check.mjs --allow-live HOST VOICE_PORT CHANNEL_ID` verbindet nur eigene Test-Clients, erzeugt ein Testvideo und räumt Clients, Streams und Dateien anschließend auf. Er benötigt freie TeamSpeak-Client-Slots.
+
+
+## YouTube-Fehler bei großen Metadaten
+
+Einzelne YouTube-Videos liefern mehr als 10 MB Metadaten, etwa zu automatisch übersetzten Untertiteln. Ältere Cerberus-Versionen brachen oberhalb von 2 MiB ab und zeigten irreführend „yt-dlp und JavaScript-Runtime prüfen“. Der korrigierte Aufruf fordert für Video nur Titel, Medien-URLs und HTTP-Header der ausgewählten Formate an; für Audio kommen die verwendeten Titeldaten hinzu. Die Größenbegrenzung bleibt bestehen. Auch getrennte Audio-/Videospuren und kombinierte Formate sind abgedeckt.
+
+Nach dem Image-Update den Bot-Container neu starten und denselben Link erneut starten. Nur das Webinterface neu zu laden aktualisiert keinen laufenden Medienprozess. Bereits gestartete Video-Bots werden beim Container-Neustart getrennt und müssen erneut verbunden werden. Die persistente Identität bleibt erhalten.
+
+Video-Fehlermeldungen unterscheiden nun unter anderem eine YouTube-Bot-Bestätigung, HTTP 403/429, Alters-/Mitgliedschaftsbeschränkungen, eine fehlende Runtime und Zeitüberschreitungen. Diese Meldungen beruhen auf festen Fehlerklassen; temporäre signierte Stream-Adressen, Header und rohe Werkzeugausgaben werden nicht angezeigt.
+
+Der Offline-Selbsttest im Image verwendet erzeugte Metadaten von mehr als 10 MB und benötigt keinen YouTube-Zugriff:
+
+```sh
+node /opt/cerberus/app/video/metadata-check.mjs
+```
+
+Er prüft das tatsächlich installierte yt-dlp als Container-Benutzer für Audio sowie kombinierte und getrennte Videoformate. Er wird beim Image-Bau ausgeführt. Die ursprüngliche Fehlerursache und die erneute Übertragung des betroffenen Links sind im [Prüfbericht](youtube-metadata-validation.md) dokumentiert.

@@ -3,16 +3,31 @@ import { createSocket } from 'node:dgram';
 import { realpath } from 'node:fs/promises';
 import { resolve, sep, extname } from 'node:path';
 import { once } from 'node:events';
+import { MediaToolError, toolFailure } from './tool-errors.mjs';
 
-export async function capture(command, args, signal, timeout = 60000, failure = 'Medienquelle konnte nicht geladen werden. Werkzeuge und Link prüfen.') {
-  const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'ignore'], signal });
-  const chunks = []; let size = 0;
-  const timer = setTimeout(() => child.kill('SIGKILL'), timeout);
-  child.stdout.on('data', chunk => { size += chunk.length; if (size > 2 * 1024 * 1024) child.kill('SIGKILL'); else chunks.push(chunk); });
+// Project only playback fields. Full YouTube metadata can include >10 MiB of captions.
+export const YOUTUBE_INFO_TEMPLATE = '{"title":%(title)j,"url":%(url)j,"http_headers":%(http_headers)j,"requested_formats":%(requested_formats.:.{url,http_headers})j}';
+
+export async function capture(command, args, signal, timeout = 60000, failure = 'Medienquelle konnte nicht geladen werden. Werkzeuge und Link prüfen.', { youtube = false } = {}) {
+  let child;
+  try { child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'], signal }); }
+  catch (error) { if (signal?.aborted) throw error; throw toolFailure('', { youtube, spawnCode: error.code || 'SPAWN', fallback: failure }); }
+  const chunks = []; let size = 0, stderr = '', timedOut = false, tooLarge = false;
+  const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, timeout);
+  // Drain stderr continuously and retain only a bounded tail, never return it verbatim.
+  child.stderr.on('data', chunk => { stderr = (stderr + chunk.toString('utf8')).slice(-32768); });
+  child.stdout.on('data', chunk => {
+    size += chunk.length;
+    if (size > 2 * 1024 * 1024) { tooLarge = true; child.kill('SIGKILL'); }
+    else chunks.push(chunk);
+  });
   try {
-    const [code] = await once(child, 'close');
-    if (code !== 0 || size > 2 * 1024 * 1024) throw new Error(failure);
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    let code;
+    try { [code] = await once(child, 'close'); }
+    catch (error) { if (signal?.aborted) throw error; throw toolFailure(stderr, { youtube, spawnCode: error.code || 'SPAWN', fallback: failure }); }
+    if (code !== 0 || tooLarge) throw toolFailure(stderr, { youtube, timedOut, tooLarge, fallback: failure });
+    try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); }
+    catch { throw new MediaToolError('MEDIA_INVALID_OUTPUT'); }
   } finally { clearTimeout(timer); if (child.exitCode === null) child.kill('SIGKILL'); }
 }
 function http(location) {
@@ -27,8 +42,8 @@ export async function resolveSource(source, config, signal) {
     const url = http(source);
     if (/(^|\.)(youtube\.com|youtube-nocookie\.com|youtu\.be)$/.test(url.hostname)) {
       const info = await capture(config.ytDlp, ['--ignore-config', '--no-playlist', '--no-warnings', '--check-formats', '--socket-timeout', '15', '--js-runtimes', config.node,
-        '--dump-single-json', '--skip-download', '-f', 'bestvideo[height<=720][vcodec^=avc1]+bestaudio/bestvideo[height<=720]+bestaudio/best[vcodec!=none][acodec!=none]', '--', source], signal, 60000, 'YouTube-Link konnte nicht aufgelöst werden. yt-dlp und JavaScript-Runtime prüfen.');
-      inputs = (info.requested_formats || [info]).map(format => ({ location: http(format.url).href, headers: format.http_headers || info.http_headers || {}, remote: true }));
+        '--output-na-placeholder', 'null', '--print', YOUTUBE_INFO_TEMPLATE, '--skip-download', '-f', 'bestvideo[height<=720][vcodec^=avc1]+bestaudio/bestvideo[height<=720]+bestaudio/best[vcodec!=none][acodec!=none]', '--', source], signal, 60000, 'YouTube-Link konnte nicht aufgelöst werden.', { youtube: true });
+      inputs = (Array.isArray(info.requested_formats) && info.requested_formats.length ? info.requested_formats : [info]).map(format => ({ location: http(format.url).href, headers: format.http_headers || info.http_headers || {}, remote: true }));
       if (inputs.length > 2) throw new Error('Nicht unterstützte YouTube-Formate.');
       title = String(info.title || 'YouTube').slice(0, 180);
     } else { inputs = [{ location: url.href, remote: true }]; title = url.hostname; }

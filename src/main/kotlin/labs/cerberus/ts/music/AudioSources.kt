@@ -69,7 +69,7 @@ internal class MediaResolver(private val root: Path, private val config: MusicCo
     private fun youtube(source: String, job: PlaybackJob): MediaInput {
         val child = job.own(ManagedProcess(listOf(config.ytDlp, "--ignore-config", "--no-playlist", "--no-warnings", "--check-formats",
             "--socket-timeout", "15", "--js-runtimes", config.javascriptRuntime,
-            "--dump-single-json", "--skip-download", "-f", "bestaudio/best", "--", source)))
+            "--print", "%(.{url,http_headers,title,artist,uploader,thumbnail})j", "--skip-download", "-f", "bestaudio/best", "--", source)))
         val output = CompletableFuture<ByteArray>()
         Thread.ofVirtual().start {
             try { output.complete(child.process.inputStream.readNBytes(2 * 1024 * 1024 + 1)) }

@@ -4,6 +4,7 @@ import { Streams } from '@honeybbq/teamspeak/stream';
 import { RTCPeerConnection, RTCRtpCodecParameters, MediaStreamTrack } from 'werift';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolveSource, MediaEncoder } from './media.mjs';
+import { MediaToolError } from './tool-errors.mjs';
 
 export function peerConfig(config) {
   return {
@@ -101,7 +102,7 @@ export class VideoPublisher {
     void this.load(active, this.state.current).catch(async error => {
       if (this.active !== active) return;
       await this.cancel();
-      this.state.error = /^(Videoquelle|Diese Quelle|YouTube-Link|Nicht unterstützte|Ungültige Medien)/.test(error.message || '') ? error.message.slice(0, 200) : 'Video konnte nicht gestartet werden. FFmpeg, yt-dlp und Quelle prüfen.';
+      this.state.error = error instanceof MediaToolError || /^(Videoquelle|Diese Quelle|YouTube-Link|Nicht unterstützte|Ungültige Medien)/.test(error.message || '') ? error.message.slice(0, 200) : 'Video konnte nicht gestartet werden. FFmpeg, yt-dlp und Quelle prüfen.';
       this.state.phase = 'ERROR'; this.changed();
       // An error needs explicit intervention; do not churn through a broken queue.
     });

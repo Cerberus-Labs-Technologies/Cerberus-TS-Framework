@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "server": "6.0.0-beta14 [Build: 1794844729]",
+  "videoPackets": 223,
+  "audioPackets": 78,
+  "decodedVideo": true,
+  "checks": [
+    "Two SDK viewers on the real TS6 server receive VP8 video and Opus audio; received keyframe decodes to PNG.",
+    "Pause freezes both tracks; resume delivers media.",
+    "Stop removes publication, closes viewers and clears queue."
+  ],
+  "cleanup": true
+}

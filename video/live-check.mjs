@@ -28,7 +28,7 @@ try {
     await client.connect({signal:AbortSignal.timeout(30000)}); await client.view.whenReady({signal:AbortSignal.timeout(10000)});
     await moveClient(client, client.clientID, BigInt(channelId)); entry.streams = new Streams(client);
   }
-  await publisher.action({action:'play',source:'clip.mp4'});
+  await publisher.action({action:'play',source:process.argv[6]||'clip.mp4'});
   await until('publisher advertises stream', () => publisher.state.phase === 'PLAYING' || publisher.state.error);
   assert.equal(publisher.state.error, null, publisher.state.error);
   for (const entry of viewers) {

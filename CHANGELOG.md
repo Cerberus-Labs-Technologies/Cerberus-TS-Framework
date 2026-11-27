@@ -2,6 +2,8 @@
 
 ## 2.0.0-SNAPSHOT
 
+- YouTube-Fehler bei großen Metadaten behoben: Audio-/Video-Bots fragen nur Wiedergabefelder ab. Video-Fehler unterscheiden Größenlimit, Werkzeug, Netzwerk und YouTube-Ablehnung; keine rohen Stream-URLs in Fehlermeldungen. Offline-Regressionstest im non-root Pelican-Runtime.
+
 - Optionale TS6-Video-Bots im Musik-Webinterface: YouTube, HTTP-Video und lokale Dateien mit VP8/Opus, synchronen Medien aus einem Decoder, Queue und Wiedergabesteuerung. Vorschau mit Channel-Freigabe, vier Zuschauern, persistenten Identitäten und Pelican-UDP-Konfiguration.
 
 - Webverwaltung für Channels, Server-/Channelgruppen, Rechtekatalog und Client-Zuweisungen; Revisionen schützen Channel-Entwürfe vor unbemerktem Überschreiben. TS6-CRUD separat an eigenen Testobjekten geprüft.

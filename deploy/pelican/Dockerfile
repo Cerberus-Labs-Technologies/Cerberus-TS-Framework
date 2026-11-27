@@ -41,6 +41,8 @@ RUN chmod 0755 /opt/cerberus/start.sh \
     && /opt/cerberus/app/bin/cerberus-ts --help
 USER container
 WORKDIR /home/container
+# Exercise real pip-installed yt-dlp as the non-root runtime user, without network access.
+RUN node /opt/cerberus/app/video/metadata-check.mjs
 STOPSIGNAL SIGTERM
 ENTRYPOINT ["/usr/bin/tini", "-g", "--"]
 CMD ["/bin/bash", "/opt/cerberus/start.sh"]
