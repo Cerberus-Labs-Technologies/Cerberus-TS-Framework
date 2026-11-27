@@ -140,3 +140,5 @@ java -cp '/private/tmp:build/install/cerberus-ts-web-preview/lib/*' WebAdministr
 ```
 
 Ohne `--allow-live` startet der Prüfer nicht. Er erstellt ausschließlich eindeutig benannte eigene Testchannels und -gruppen, prüft CRUD/Kopien/Rechte und entfernt sie wieder ohne Force. Er ändert keine Mitgliedschaften echter Clients. Die Konfiguration muss auf den vorgesehenen Testserver zeigen und einen verifizierten SSH-Host-Key verwenden. Zugangsdaten und Webtoken werden nicht ausgegeben.
+
+Der aktuelle Funktions-, TS6-, Container- und Darstellungsnachweis steht in [Webverwaltungs-Prüfung](web-administration-validation.md).
