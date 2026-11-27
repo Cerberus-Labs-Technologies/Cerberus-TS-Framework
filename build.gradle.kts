@@ -78,7 +78,7 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.1")
     testImplementation("org.apache.sshd:sshd-core:2.16.0")
-    testImplementation("com.h2database:h2:2.4.240")
+    testImplementation("com.h2database:h2:2.5.252")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.14.1")
 }
 
