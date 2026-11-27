@@ -68,7 +68,7 @@ dependencies {
     implementation("com.github.mwiede:jsch:2.28.8")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.23.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.23.0")
-    implementation("org.eclipse.angus:angus-mail:2.0.4")
+    implementation("org.eclipse.angus:angus-mail:2.0.5")
     implementation("org.yaml:snakeyaml:2.7")
     api("jakarta.persistence:jakarta.persistence-api:3.2.0")
     implementation("org.hibernate.orm:hibernate-core:7.4.17.Final")
