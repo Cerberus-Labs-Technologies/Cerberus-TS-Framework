@@ -20,3 +20,11 @@ Die Pelican-API bestätigte am laufenden Bot die öffentliche Video-IP und alle 
 Offen bleiben ein Sicht-/Hörtest im offiziellen TeamSpeak-6-Desktop-Client mit dem aktualisierten Image und ein Test mit der konkret betroffenen MP4-Quelle. Die Cookie-Funktion garantiert keine Freigabe durch YouTube und ersetzt keine eventuell zusätzlich verlangten Tokens.
 
 API-Schlüssel, Cookie-Inhalte, Web-Zugriffstokens und rohe Serverlogs gehören nicht zu den Prüfberichten oder zum Repository.
+
+## Veröffentlichung und laufende Instanz
+
+Funktionaler Commit: `90f8dd2b6cff5e3d30ce12c20cde6f9b71a44f3a`. [Kotlin/CodeQL](https://github.com/Cerberus-Labs-Technologies/Cerberus-TS-Framework/actions/runs/46088755466) und [Pelican-Image einschließlich Linux-Tests](https://github.com/Cerberus-Labs-Technologies/Cerberus-TS-Framework/actions/runs/46088755513) waren erfolgreich. Das öffentlich abrufbare amd64-/arm64-Image hat den Digest `sha256:e1974db2074e70ef045f9fbae23ae4f715e976f29cb4115753a175111e101a46`.
+
+Der Cerberus-Bot-Container wurde über die vom Benutzer bereitgestellte Pelican-API neu gestartet. Vorher liefen dort keine Audio-Bots; `kino_1` stand ohne Queue wegen der YouTube-Bot-Prüfung auf Fehler. Der Bot wurde mit seiner persistenten Identität, dem bisherigen Namen „Kino Test“, Channel 8 und 25 Prozent Lautstärke wieder verbunden. Ein erzeugter MP4-Testclip wurde für den Sicht-/Hörtest gestartet.
+
+Ein [erneuter externer Chromium-Empfänger](validation/video-pelican-native-after.json) bestätigte am aktualisierten `kino_1` die gemeinsame explizite MediaStream-ID, öffentliche eingebettete ICE-Adressen, gerenderte Bilder und decodierten Ton. Der Testzuschauer wurde getrennt. Eine Bestätigung aus dem offiziellen TeamSpeak-Desktop-Client liegt zu diesem Zeitpunkt noch nicht vor. Eine YouTube-Cookie-Datei war noch nicht hinterlegt; ein angemeldeter YouTube-Abruf wurde deshalb nicht behauptet.

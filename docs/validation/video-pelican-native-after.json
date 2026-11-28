@@ -1,0 +1,34 @@
+{
+  "mode": "pelican-native-webrtc-viewer",
+  "functionalCommit": "90f8dd2b6cff5e3d30ce12c20cde6f9b71a44f3a",
+  "publicImageDigest": "sha256:e1974db2074e70ef045f9fbae23ae4f715e976f29cb4115753a175111e101a46",
+  "teamSpeakDesktopClientVerified": false,
+  "publisher": "kino_1",
+  "channelId": 8,
+  "source": "generated MP4 with moving test pattern and 440 Hz tone",
+  "offerExplicitMediaStream": true,
+  "allEmbeddedCandidatesUsePublicIP": true,
+  "receiver": {
+    "connection": "connected",
+    "ice": "connected",
+    "video": {
+      "packets": 280,
+      "framesDecoded": 27,
+      "width": 320,
+      "height": 180
+    },
+    "audio": {
+      "packets": 103,
+      "samples": 96960,
+      "energy": 0.0005093389372595151
+    },
+    "render": {
+      "width": 320,
+      "height": 180,
+      "time": 1.068,
+      "frames": 27
+    }
+  },
+  "passed": true,
+  "testViewerCleanedUp": true
+}
