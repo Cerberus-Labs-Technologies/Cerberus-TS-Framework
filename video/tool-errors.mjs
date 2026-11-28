@@ -1,6 +1,7 @@
 /** Only fixed messages cross the worker boundary. stderr can contain signed URLs and credentials. */
 const messages = {
-  YOUTUBE_BOT_CHALLENGE: 'YouTube verlangt eine Bot-Bestätigung für diese Server-IP. Ein automatischer Abruf ist derzeit nicht möglich.',
+  YOUTUBE_COOKIES: 'YouTube-Cookie-Datei ungültig oder nicht lesbar. Netscape-Format und music.cookies.file prüfen; außerhalb des Medienverzeichnisses ablegen.',
+  YOUTUBE_BOT_CHALLENGE: 'YouTube verlangt eine Bot-Bestätigung für diese Server-IP. Eine gültige YouTube-Cookie-Datei hinterlegen oder erneuern; siehe Video-Anleitung.',
   YOUTUBE_RATE_LIMIT: 'YouTube begrenzt Anfragen von dieser Server-IP (HTTP 429). Bitte später erneut versuchen.',
   YOUTUBE_RESTRICTED: 'Dieses YouTube-Video verlangt eine Anmeldung, Altersfreigabe oder Mitgliedschaft. Bitte eine frei verfügbare Quelle verwenden.',
   YOUTUBE_REGION: 'Dieses YouTube-Video ist am Standort des Bot-Servers nicht verfügbar.',

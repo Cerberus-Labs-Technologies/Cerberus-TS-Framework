@@ -33,3 +33,6 @@ logs/
 # File managers #
 .directory
 /video/node_modules/
+
+# Private browser session cookies
+**/*cookies*.txt

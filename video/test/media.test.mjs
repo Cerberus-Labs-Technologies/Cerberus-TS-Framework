@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, mkdir, symlink, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { resolveSource, MediaEncoder } from '../media.mjs';
-import { canWatch, peerConfig, candidate } from '../publisher.mjs';
+import { canWatch, peerConfig, candidate, addMediaTracks, publicOffer } from '../publisher.mjs';
 import { RTCPeerConnection } from 'werift';
 
 const ffmpeg = process.env.CERBERUS_TEST_FFMPEG;
@@ -18,11 +18,14 @@ test('viewer policy fails closed for other channels, query clients, unknown clie
 test('offer includes audio first and interoperable VP8/Opus only', async () => {
   const pc = new RTCPeerConnection({ ...peerConfig({}), iceServers: [] });
   try {
-    pc.addTransceiver('audio', { direction: 'sendonly' }); pc.addTransceiver('video', { direction: 'sendonly' });
+    addMediaTracks(pc);
     const offer = await pc.createOffer();
     assert.ok(offer.sdp.indexOf('m=audio') < offer.sdp.indexOf('m=video'));
     assert.match(offer.sdp, /opus\/48000\/2/); assert.match(offer.sdp, /VP8\/90000/);
     assert.ok(offer.sdp.length < 6000);
+    const ids = [...offer.sdp.matchAll(/^a=msid:([^ ]+) /gm)].map(m => m[1]);
+    assert.equal(ids.length, 2); assert.notEqual(ids[0], '-'); assert.equal(ids[0], ids[1]);
+    assert.equal((offer.sdp.match(/a=sendonly/g)||[]).length, 2);
   } finally { await pc.close(); }
 });
 test('sources reject protocols, credentials, traversal and symlinks', async () => {
@@ -87,4 +90,28 @@ test('FFmpeg runtime volume command actually mutes decoded PCM', {skip:!ffmpeg,t
   child.stderr.resume();
   const timer=setTimeout(()=>MediaEncoder.prototype.volume.call({closed:false,child},0),900);
   try{const [code]=await once(child,'close');assert.equal(code,0);assert.ok(before>500);assert.equal(after,0);}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');}
+});
+
+test('public IPv4 is present in embedded offer candidates as well as trickle candidates', () => {
+  const sdp = 'v=0\r\na=candidate:1 1 udp 123 172.18.0.4 24903 typ host\r\na=candidate:2 1 udp 12 65.108.107.32 44000 typ srflx\r\n';
+  const offer = publicOffer(sdp, '65.108.107.32');
+  assert.ok(offer.includes('65.108.107.32 24903 typ host')); assert.ok(!offer.includes('172.18.0.4'));
+  assert.ok(offer.includes('65.108.107.32 44000 typ srflx')); assert.equal(publicOffer(sdp, null), sdp);
+});
+
+test('failed viewer connection becomes a visible safe error and releases its reserved slot', {timeout:15000}, async()=>{
+  const {EventEmitter}=await import('node:events'); const {VideoPublisher}=await import('../publisher.mjs');
+  const publisher=new VideoPublisher({channelId:1,maxViewers:4,stun:'stun:127.0.0.1:9'},()=>{});
+  const active={peers:new Map(),abort:new AbortController()};publisher.active=active;publisher.state.phase='PLAYING';
+  publisher.client={view:{client:()=>({channelID:1n,type:0})}};
+  const request=new EventEmitter(),peer=new EventEmitter();request.viewer={clientId:1};request.deny=async()=>assert.fail('Denied');
+  peer.sendCandidate=async()=>{};peer.close=async()=>{};request.accept=async()=>peer;
+  try{
+    await publisher.accept(active,request);
+    const entry=active.peers.get(1);assert.ok(entry);
+    entry.pc.connectionStateChange.execute('failed');
+    assert.match(publisher.state.viewerError,/UDP-Allocations/);assert.equal(active.peers.size,0);
+    assert.equal(publisher.state.phase,'PLAYING');assert.equal(publisher.state.viewers,0);
+    await entry.pc.close();
+  }finally{await publisher.cancel();}
 });

@@ -44,7 +44,8 @@ class BotConfig(val connection: ConnectionConfig, val dataDirectory: Path = Path
                 required("command.prefix", "!"), int("reconnect.attempts", 10), millis("reconnect.delay.ms", 10000),
                 millis("keepalive.ms", 60000), value("rest.port")?.toInt(), required("rest.host", "127.0.0.1"), value("admin.uid"),
                 MusicConfig(required("music.ffmpeg", "ffmpeg"), required("music.ytdlp", "yt-dlp"),
-                    required("music.js.runtime", "node"), int("music.max.bots", 4), int("music.max.queue", 100)),
+                    required("music.js.runtime", "node"), int("music.max.bots", 4), int("music.max.queue", 100),
+                    value("music.cookies.file")?.takeIf(String::isNotBlank)?.let(Path::of)),
                 required("web.enabled", "true").toBooleanStrict(), int("web.port", 24875), required("web.host", "127.0.0.1"))
         }
     }

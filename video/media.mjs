@@ -4,6 +4,7 @@ import { realpath } from 'node:fs/promises';
 import { resolve, sep, extname } from 'node:path';
 import { once } from 'node:events';
 import { MediaToolError, toolFailure } from './tool-errors.mjs';
+import { withYoutubeCookies } from './cookies.mjs';
 
 // Project only playback fields. Full YouTube metadata can include >10 MiB of captions.
 export const YOUTUBE_INFO_TEMPLATE = '{"title":%(title)j,"url":%(url)j,"http_headers":%(http_headers)j,"requested_formats":%(requested_formats.:.{url,http_headers})j}';
@@ -41,8 +42,8 @@ export async function resolveSource(source, config, signal) {
   if (/^https?:/i.test(source)) {
     const url = http(source);
     if (/(^|\.)(youtube\.com|youtube-nocookie\.com|youtu\.be)$/.test(url.hostname)) {
-      const info = await capture(config.ytDlp, ['--ignore-config', '--no-playlist', '--no-warnings', '--check-formats', '--socket-timeout', '15', '--js-runtimes', config.node,
-        '--output-na-placeholder', 'null', '--print', YOUTUBE_INFO_TEMPLATE, '--skip-download', '-f', 'bestvideo[height<=720][vcodec^=avc1]+bestaudio/bestvideo[height<=720]+bestaudio/best[vcodec!=none][acodec!=none]', '--', source], signal, 60000, 'YouTube-Link konnte nicht aufgelöst werden.', { youtube: true });
+      const info = await withYoutubeCookies(config, cookieArgs => capture(config.ytDlp, ['--ignore-config', ...cookieArgs, '--no-playlist', '--no-warnings', '--check-formats', '--socket-timeout', '15', '--js-runtimes', config.node,
+        '--output-na-placeholder', 'null', '--print', YOUTUBE_INFO_TEMPLATE, '--skip-download', '-f', 'bestvideo[height<=720][vcodec^=avc1]+bestaudio/bestvideo[height<=720]+bestaudio/best[vcodec!=none][acodec!=none]', '--', source], signal, 60000, 'YouTube-Link konnte nicht aufgelöst werden.', { youtube: true }));
       inputs = (Array.isArray(info.requested_formats) && info.requested_formats.length ? info.requested_formats : [info]).map(format => ({ location: http(format.url).href, headers: format.http_headers || info.http_headers || {}, remote: true }));
       if (inputs.length > 2) throw new Error('Nicht unterstützte YouTube-Formate.');
       title = String(info.title || 'YouTube').slice(0, 180);

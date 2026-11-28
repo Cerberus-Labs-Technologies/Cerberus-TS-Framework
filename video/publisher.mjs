@@ -1,7 +1,7 @@
 import { Client, generateIdentity, parseIdentity } from '@honeybbq/teamspeak/client';
 import { moveClient, updateClient } from '@honeybbq/teamspeak';
 import { Streams } from '@honeybbq/teamspeak/stream';
-import { RTCPeerConnection, RTCRtpCodecParameters, MediaStreamTrack } from 'werift';
+import { RTCPeerConnection, RTCRtpCodecParameters, MediaStreamTrack, MediaStream } from 'werift';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolveSource, MediaEncoder } from './media.mjs';
 import { MediaToolError } from './tool-errors.mjs';
@@ -26,6 +26,19 @@ export function candidate(c, publicAddress) {
     if (fields[6] === "typ" && fields[7] === "host") { fields[4] = publicAddress; value = fields.join(" "); }
   }
   return { candidate: value, sdpMid: c.sdpMid ?? null, sdpMLineIndex: c.sdpMLineIndex ?? null };
+}
+/** Signal one explicit MediaStream, audio first, for native TS6 MediaStream consumers. */
+export function addMediaTracks(pc) {
+  const audio = new MediaStreamTrack({ kind: 'audio' });
+  const video = new MediaStreamTrack({ kind: 'video' });
+  const stream = new MediaStream(); stream.addTrack(audio); stream.addTrack(video);
+  pc.addTransceiver(audio, { direction: 'sendonly', streams: [stream] });
+  pc.addTransceiver(video, { direction: 'sendonly', streams: [stream] });
+  return { audio, video };
+}
+export function publicOffer(sdp, publicAddress) {
+  if (!publicAddress) return sdp;
+  return sdp.replace(/^a=candidate:[^\r\n]+/gm, line => 'a=' + candidate({ candidate: line.slice(2) }, publicAddress).candidate);
 }
 export function canWatch(client, viewerId, channelId, count, limit) {
   return count < limit && client.view.client(viewerId)?.channelID === BigInt(channelId) && client.view.client(viewerId)?.type === 0;
@@ -142,8 +155,7 @@ export class VideoPublisher {
     const id = request.viewer.clientId;
     if (this.active !== active || active.peers.has(id) || !canWatch(this.client, id, this.state.channelId, active.peers.size, this.config.maxViewers)) { await request.deny('Nur Zuschauer im Bot-Channel; Zuschauerlimit beachten.'); return; }
     const pc = new RTCPeerConnection(peerConfig(this.config));
-    const audio = new MediaStreamTrack({ kind: 'audio' }); const video = new MediaStreamTrack({ kind: 'video' });
-    pc.addTrack(audio); pc.addTrack(video);
+    const { audio, video } = addMediaTracks(pc);
     let peer; const pending = [];
     const entry = { pc, audio, video, close: async () => {
       if (active.peers.get(id) !== entry) return;
@@ -151,19 +163,27 @@ export class VideoPublisher {
       audio.stop(); video.stop(); await pc.close(); this.count(active);
     } };
     active.peers.set(id, entry); // Reserve capacity before any asynchronous negotiation.
-    entry.timer = setTimeout(() => { if (pc.connectionState !== 'connected') void entry.close(); }, 25000);
+    const failed = message => {
+      if (this.active !== active || active.peers.get(id) !== entry) return;
+      this.state.viewerError = message; this.changed(); void entry.close();
+    };
+    entry.timer = setTimeout(() => {
+      if (pc.connectionState !== 'connected') failed('Keine Zuschauerverbindung nach 25 Sekunden. Öffentliche Video-IP, UDP-Allocations und Firewall prüfen. Stream anschließend im TS6-Client neu öffnen.');
+    }, 25000);
     request.on('closed', () => { if (!peer) void entry.close(); });
-    pc.onIceCandidate.subscribe(c => { if (!c) return; if (peer) void peer.sendCandidate(candidate(c, this.config.publicAddress)).catch(() => entry.close()); else pending.push(candidate(c, this.config.publicAddress)); });
+    pc.onIceCandidate.subscribe(c => { if (!c) return; if (peer) void peer.sendCandidate(candidate(c, this.config.publicAddress)).catch(() => failed('Video-ICE-Signalisierung fehlgeschlagen. Stream im TS6-Client neu öffnen.')); else pending.push(candidate(c, this.config.publicAddress)); });
     pc.connectionStateChange.subscribe(state => {
-      if (state === 'failed' || state === 'closed' || state === 'disconnected') void entry.close();
+      if (state === 'failed' || state === 'disconnected') failed('Zuschauerverbindung unterbrochen. Öffentliche Video-IP, UDP-Allocations und Firewall prüfen.');
+      if (state === 'closed') void entry.close();
+      if (state === 'connected') { clearTimeout(entry.timer); this.state.viewerError = null; }
       this.count(active);
     });
     try {
       await pc.setLocalDescription(await pc.createOffer());
       if (this.active !== active || !canWatch(this.client, id, this.state.channelId, 0, 1) || active.peers.get(id) !== entry) { await entry.close(); return; }
-      peer = await request.accept(pc.localDescription.sdp);
-      peer.on('answer', sdp => { void pc.setRemoteDescription({ type: 'answer', sdp }).catch(() => entry.close()); });
-      peer.on('candidate', c => { void pc.addIceCandidate(c).catch(() => entry.close()); });
+      peer = await request.accept(publicOffer(pc.localDescription.sdp, this.config.publicAddress));
+      peer.on('answer', sdp => { void pc.setRemoteDescription({ type: 'answer', sdp }).catch(() => failed('Video-Aushandlung mit dem Zuschauer fehlgeschlagen. TS6-Client aktualisieren und Stream neu öffnen.')); });
+      peer.on('candidate', c => { void pc.addIceCandidate(c).catch(() => failed('Video-ICE-Kandidat abgelehnt. Öffentliche Video-IP und UDP-Allocations prüfen.')); });
       peer.on('closed', () => { void entry.close(); });
       for (const c of pending) await peer.sendCandidate(c);
     } catch (error) { await entry.close(); throw error; }

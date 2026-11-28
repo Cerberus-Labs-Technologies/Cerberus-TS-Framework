@@ -1,0 +1,46 @@
+{
+  "mode": "local-native-webrtc",
+  "teamSpeakClientVerified": false,
+  "offerHasSharedStream": true,
+  "receiver": {
+    "connection": "connected",
+    "tracks": [
+      {
+        "kind": "audio",
+        "streamIds": [
+          "fe6615fc-bdd4-49a1-8db2-c32d1edb8b3f"
+        ]
+      },
+      {
+        "kind": "video",
+        "streamIds": [
+          "fe6615fc-bdd4-49a1-8db2-c32d1edb8b3f"
+        ]
+      }
+    ],
+    "video": [
+      {
+        "packets": 223,
+        "frames": 28,
+        "width": 320,
+        "height": 180
+      }
+    ],
+    "audio": [
+      {
+        "packets": 82,
+        "samples": 77280,
+        "energy": 0.000534499854266597
+      }
+    ],
+    "render": {
+      "width": 320,
+      "height": 180,
+      "time": 1.065,
+      "frames": 28
+    }
+  },
+  "pictureHasContent": true,
+  "passed": true,
+  "publisherCleanedUp": true
+}

@@ -21,7 +21,7 @@ Das aktualisierte Cerberus-Image enthält Java, Node, FFmpeg, ffprobe, yt-dlp un
 3. **Video public IPv4** (`CERBERUS_VIDEO_PUBLIC_ADDRESS`) auf die öffentliche IPv4 des Pelican-Nodes setzen. Auf dem genannten Root wäre das `65.108.107.32`, sofern der Bot auf demselben Node läuft.
 4. **Video UDP first port / last port** auf `24900` / `24919` belassen oder einen freien anderen Bereich wählen. Alle Ports dieses Bereichs müssen 1:1 vom Host auf den Container veröffentlicht werden. Bereits belegte Ports vorher prüfen.
 
-Zusätzlich benötigt der Bot ausgehend Zugriff auf den TeamSpeak-Voice-Port, die Videoquelle und einen STUN-Server. Standard ist `stun:stun.l.google.com:19302`; mit `CERBERUS_VIDEO_STUN` änderbar. TURN-/SFU-Weiterleitung ist in dieser Vorschau nicht integriert. Bei schwierigen NAT-/Firewall-Konstellationen kann die direkte Verbindung scheitern; dann erscheint eine Zuschauerfehlermeldung. Die öffentliche IPv4 wird als ICE-Kandidat angekündigt, ohne einen Socket an eine im Container nicht vorhandene Adresse zu binden.
+Zusätzlich benötigt der Bot ausgehend Zugriff auf den TeamSpeak-Voice-Port, die Videoquelle und einen STUN-Server. Standard ist `stun:stun.l.google.com:19302`; mit `CERBERUS_VIDEO_STUN` änderbar. TURN-/SFU-Weiterleitung ist in dieser Vorschau nicht integriert. Bei schwierigen NAT-/Firewall-Konstellationen kann die direkte Verbindung scheitern; dann erscheint eine Zuschauerfehlermeldung. Die öffentliche IPv4 wird sowohl im SDP-Angebot als auch in nachgereichten ICE-Kandidaten angekündigt, ohne einen Socket an eine im Container nicht vorhandene Adresse zu binden.
 
 ## Betrieb ohne Container
 
@@ -69,3 +69,35 @@ node /opt/cerberus/app/video/metadata-check.mjs
 ```
 
 Er prüft das tatsächlich installierte yt-dlp als Container-Benutzer für Audio sowie kombinierte und getrennte Videoformate. Er wird beim Image-Bau ausgeführt. Die ursprüngliche Fehlerursache und die erneute Übertragung des betroffenen Links sind im [Prüfbericht](youtube-metadata-validation.md) dokumentiert.
+
+## YouTube mit privater Cookie-Datei
+
+Audio- und Video-Bots unterstützen optional eine Netscape-Cookie-Datei. Die Datei wird bei jeder YouTube-Auflösung neu gelesen. yt-dlp erhält eine private temporäre Kopie mit Dateirechten `0600`; gleichzeitige Bots ändern die hochgeladene Originaldatei nicht. Nach Erfolg, Fehler oder regulärem Abbruch wird die Kopie gelöscht. Cookie-Inhalte und Werkzeugfehler werden nicht in API-Antworten ausgegeben.
+
+1. Nur die benötigten YouTube-Cookies im Netscape-Format exportieren. Die offizielle [Anleitung zum YouTube-Export](https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies) beschreibt eine separate private Browsersitzung, `youtube.com/robots.txt`, den Export und das anschließende Schließen der Sitzung. Keine vollständigen Browserprofile exportieren.
+2. Im Pelican-Dateimanager als `config/youtube.cookies.txt` hochladen. Die erste Zeile muss `# Netscape HTTP Cookie File` oder `# HTTP Cookie File` sein. Die Datei gehört außerhalb von `data/music/files`, Webassets und Git; Dateirechte möglichst `0600` setzen. Die Datei gewährt Zugriff auf die Sitzung: nicht im Chat, Repository oder in Screenshots veröffentlichen.
+3. In `config/cerberus.properties` ergänzen:
+
+   ```properties
+   music.cookies.file=/home/container/config/youtube.cookies.txt
+   ```
+
+   Alternativ nach Egg-Aktualisierung **YouTube cookies file** (`CERBERUS_MUSIC_COOKIES_FILE`) auf diesen Pfad setzen. Ausschließlich den Dateipfad eintragen. Ein nicht leeres Panel-Feld überschreibt die Properties-Datei.
+4. Das aktualisierte Image verwenden und den Bot-Container neu starten. Den Video-Bot erneut verbinden und den YouTube-Link starten. Spätere Cookie-Erneuerungen am selben Pfad werden beim nächsten Abruf übernommen.
+
+Das ist keine Garantie gegen YouTubes Bot-Prüfung: Server-IP, zusätzliche Token-Anforderungen, abgelaufene Cookies und Videobeschränkungen können den Abruf weiterhin verhindern. yt-dlp weist auf mögliche Kontosperren hin; dafür nach Möglichkeit eine separate Sitzung/ein separates Konto verwenden. Details: [yt-dlp Cookie-FAQ](https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp) und [YouTube-Hinweise](https://github.com/yt-dlp/yt-dlp/wiki/Extractors#youtube).
+
+## Stream sichtbar, Bild und Ton fehlen
+
+Eine veröffentlichte Stream-Ankündigung beweist noch keine Medienverbindung. Der Zuschauerzähler zählt erst verbundene WebRTC-Empfänger. Bleibt er nach dem Öffnen im TS6-Client bei null, öffentliche Video-IP, UDP-Allocations **am Bot-Container**, identische Host-/Container-Ports und beide Firewalls prüfen. Nach 25 Sekunden ohne Verbindung zeigt Cerberus eine konkrete Zuschauerfehlermeldung; anschließend den Stream im TS6-Client schließen und erneut öffnen.
+
+Audio und Video werden explizit derselben MediaStream-ID zugeordnet und ausschließlich als Sendespuren angeboten. Der native Chromium-Empfängertest prüft nicht nur RTP-Pakete, sondern decodierte Videobilder, gerenderte Bildinhalte, fortschreitende Wiedergabe und decodierte Audioenergie. Lokal mit installiertem `web/node_modules/@playwright/test`, Chromium und FFmpeg ausführbar:
+
+```sh
+CERBERUS_BROWSER=/pfad/zu/chromium \
+CERBERUS_TEST_FFMPEG=/pfad/zu/ffmpeg \
+CERBERUS_TEST_FFPROBE=/pfad/zu/ffprobe \
+node video/browser-check.mjs /tmp/video-native-report.json
+```
+
+Dieser Test verwendet den echten Publisher/Encoder, aber isolierte Signalisierung. Er ersetzt keinen Sicht-/Hörtest im offiziellen TS6-Client und keine Prüfung der laufenden Pelican-Instanz.

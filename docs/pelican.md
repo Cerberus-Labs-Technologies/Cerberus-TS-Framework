@@ -148,3 +148,5 @@ Quellen: [Pelican-Egg-Konfiguration](https://pelican.dev/docs/eggs/creating-a-cu
 [yt-dlp-Abhängigkeiten](https://github.com/yt-dlp/yt-dlp#dependencies).
 
 Für optionale Video-Bots zusätzlich die UDP-Allocations und die öffentliche Node-IP aus [docs/video.md](video.md) einrichten. Die vorhandene primäre Allocation bleibt für das Webinterface erhalten.
+
+YouTube-Cookies lassen sich für Audio und Video als private Datei unter `config/youtube.cookies.txt` hinterlegen. In `config/cerberus.properties` `music.cookies.file=/home/container/config/youtube.cookies.txt` setzen oder die neue Egg-Variable `CERBERUS_MUSIC_COOKIES_FILE` verwenden. Export, Schutz und Grenzen stehen in [Video-Anleitung](video.md#youtube-mit-privater-cookie-datei).

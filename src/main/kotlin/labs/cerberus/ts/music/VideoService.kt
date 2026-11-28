@@ -47,6 +47,7 @@ class VideoService(private val directory: Path, private val config: MusicConfig)
             "directory" to root.toString(), "identity" to root.resolve("identity.key").toString(),
             "files" to directory.toAbsolutePath().resolve("files").toString(), "ffmpeg" to config.ffmpeg,
             "ffprobe" to env.getOrDefault("CERBERUS_VIDEO_FFPROBE", Path.of(config.ffmpeg).parent?.resolve("ffprobe")?.toString() ?: "ffprobe"),
+            "cookiesFile" to config.cookiesFile?.toAbsolutePath()?.toString(),
             "ytDlp" to config.ytDlp, "node" to config.javascriptRuntime, "maxQueue" to minOf(config.maxQueue, 100),
             "maxViewers" to 4, "portMin" to minimum, "portMax" to maximum,
             "publicAddress" to publicAddress, "stun" to env["CERBERUS_VIDEO_STUN"]

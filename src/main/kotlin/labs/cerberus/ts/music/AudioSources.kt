@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 data class MusicConfig(val ffmpeg: String = "ffmpeg", val ytDlp: String = "yt-dlp",
-    val javascriptRuntime: String = "node", val maxBots: Int = 4, val maxQueue: Int = 100) {
+    val javascriptRuntime: String = "node", val maxBots: Int = 4, val maxQueue: Int = 100, val cookiesFile: Path? = null) {
     init { require(ffmpeg.isNotBlank() && ytDlp.isNotBlank() && javascriptRuntime.isNotBlank()); require(maxBots in 1..32 && maxQueue in 1..1000) }
 }
 
@@ -66,8 +66,9 @@ internal class MediaResolver(private val root: Path, private val config: MusicCo
         return MediaInput(file.toString(), remote = false)
     }
 
-    private fun youtube(source: String, job: PlaybackJob): MediaInput {
-        val child = job.own(ManagedProcess(listOf(config.ytDlp, "--ignore-config", "--no-playlist", "--no-warnings", "--check-formats",
+    private fun youtube(source: String, job: PlaybackJob): MediaInput = YoutubeCookies.open(config.cookiesFile, root).use { cookies ->
+        job.own(cookies)
+        val child = job.own(ManagedProcess(listOf(config.ytDlp) + cookies.arguments + listOf("--ignore-config", "--no-playlist", "--no-warnings", "--check-formats",
             "--socket-timeout", "15", "--js-runtimes", config.javascriptRuntime,
             "--print", "%(.{url,http_headers,title,artist,uploader,thumbnail})j", "--skip-download", "-f", "bestaudio/best", "--", source)))
         val output = CompletableFuture<ByteArray>()
@@ -78,7 +79,7 @@ internal class MediaResolver(private val root: Path, private val config: MusicCo
         try {
             val bytes = output.get(60, TimeUnit.SECONDS)
             require(bytes.size <= 2 * 1024 * 1024) { "YouTube-Antwort zu groß" }
-            check(child.process.waitFor(5, TimeUnit.SECONDS) && child.process.exitValue() == 0) { "YouTube-Link konnte nicht aufgelöst werden; yt-dlp und JavaScript-Runtime prüfen" }
+            check(child.process.waitFor(5, TimeUnit.SECONDS) && child.process.exitValue() == 0) { "YouTube-Link konnte nicht aufgelöst werden; Zugriff, Cookie-Datei, yt-dlp und JavaScript-Runtime prüfen" }
             val json = ObjectMapper().readTree(bytes)
             val url = json.path("url").asText()
             val uri = URI(url)
@@ -86,7 +87,7 @@ internal class MediaResolver(private val root: Path, private val config: MusicCo
             val headers = json.path("http_headers").properties().associate { it.key to it.value.asText() }
             require(headers.size <= 30 && headers.all { (key, value) -> key.matches(Regex("[A-Za-z0-9-]+")) &&
                 value.length <= 8192 && value.none { it == '\r' || it == '\n' || it == '\u0000' } })
-            return MediaInput(url, headers, metadata = TrackMetadata(json.path("title").asText("YouTube"),
+            return@use MediaInput(url, headers, metadata = TrackMetadata(json.path("title").asText("YouTube"),
                 json.path("artist").asText().ifBlank { json.path("uploader").asText() }.takeIf(String::isNotBlank),
                 artworkUrl = json.path("thumbnail").asText().takeIf(String::isNotBlank)))
         } finally { child.close() }

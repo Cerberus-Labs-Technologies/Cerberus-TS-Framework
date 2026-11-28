@@ -30,6 +30,7 @@ def eggs():
         variable('Video public IPv4', 'CERBERUS_VIDEO_PUBLIC_ADDRESS', '', 'nullable|ipv4', 'Für Video-Bots: öffentliche IPv4 des Pelican-Nodes. Zusätzliche UDP-Allocations müssen 1:1 veröffentlicht werden; siehe docs/video.md.'),
         variable('Video UDP first port', 'CERBERUS_VIDEO_PORT_MIN', '24900', 'required|integer|between:1024,65534', 'Erster UDP-Port für WebRTC. Alle Ports bis einschließlich Video UDP last port als zusätzliche Allocations zuweisen und in der Firewall freigeben.'),
         variable('Video UDP last port', 'CERBERUS_VIDEO_PORT_MAX', '24919', 'required|integer|between:1025,65535', 'Letzter UDP-Port für WebRTC; muss größer als der erste Port sein. Primäre TCP-Allocation bleibt das Webinterface.'),
+        variable('YouTube cookies file', 'CERBERUS_MUSIC_COOKIES_FILE', '', 'nullable|string|max:1024', 'Optionaler Pfad zur privaten Netscape-Cookie-Datei, z. B. /home/container/config/youtube.cookies.txt. Nur den Pfad eintragen, niemals Cookie-Inhalte. Gilt für Audio und Video.'),
         variable('Maximum music bots', 'CERBERUS_MUSIC_MAX_BOTS', '4', 'required|integer|between:1,32', 'Jeder Musikbot belegt einen TeamSpeak-Client-Slot.'),
         variable('Maximum queue size', 'CERBERUS_MUSIC_MAX_QUEUE', '100', 'required|integer|between:1,10000', 'Maximale Einträge je Musikbot.'),
     ]

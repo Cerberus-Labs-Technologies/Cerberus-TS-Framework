@@ -1,0 +1,97 @@
+{
+  "clientId": 112,
+  "publisher": {
+    "phase": "PLAYING",
+    "viewers": 0,
+    "error": null,
+    "viewerError": null
+  },
+  "receiver": {
+    "mode": "pelican-native-webrtc-viewer",
+    "teamSpeakDesktopClientVerified": false,
+    "candidatePorts": [
+      {
+        "port": 24900,
+        "type": "host",
+        "isExpectedPublicIP": true
+      },
+      {
+        "port": 24900,
+        "type": "srflx",
+        "isExpectedPublicIP": true
+      }
+    ],
+    "offerExplicitMediaStream": false,
+    "embeddedCandidates": [
+      {
+        "port": 24900,
+        "type": "host",
+        "isExpectedPublicIP": false
+      },
+      {
+        "port": 24900,
+        "type": "srflx",
+        "isExpectedPublicIP": true
+      },
+      {
+        "port": 24900,
+        "type": "host",
+        "isExpectedPublicIP": false
+      },
+      {
+        "port": 24900,
+        "type": "srflx",
+        "isExpectedPublicIP": true
+      }
+    ],
+    "receiver": {
+      "connection": "connected",
+      "ice": "connected",
+      "tracks": [
+        {
+          "kind": "audio",
+          "streams": [
+            "default"
+          ]
+        },
+        {
+          "kind": "video",
+          "streams": [
+            "default"
+          ]
+        }
+      ],
+      "video": [
+        {
+          "packets": 213,
+          "frames": 28,
+          "width": 320,
+          "height": 180
+        }
+      ],
+      "audio": [
+        {
+          "packets": 72,
+          "samples": 69120,
+          "energy": 0.0005211741525196332
+        }
+      ],
+      "render": {
+        "width": 320,
+        "height": 180,
+        "time": 1.103,
+        "frames": 28
+      }
+    },
+    "passed": true,
+    "cleanedUp": true
+  },
+  "publisherAfter": {
+    "phase": "PLAYING",
+    "viewers": 0,
+    "error": null,
+    "viewerError": null
+  },
+  "testBotRemoved": true,
+  "testFileRemoved": true
+}

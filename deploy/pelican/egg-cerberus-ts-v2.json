@@ -185,6 +185,16 @@
             "field_type": "text"
         },
         {
+            "name": "YouTube cookies file",
+            "description": "Optionaler Pfad zur privaten Netscape-Cookie-Datei, z. B. /home/container/config/youtube.cookies.txt. Nur den Pfad eintragen, niemals Cookie-Inhalte. Gilt für Audio und Video.",
+            "env_variable": "CERBERUS_MUSIC_COOKIES_FILE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:1024",
+            "field_type": "text"
+        },
+        {
             "name": "Maximum music bots",
             "description": "Jeder Musikbot belegt einen TeamSpeak-Client-Slot.",
             "env_variable": "CERBERUS_MUSIC_MAX_BOTS",
